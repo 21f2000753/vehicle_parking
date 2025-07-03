@@ -9,7 +9,7 @@ with app.app_context():
         admin_user = User(
             username='admin',
             email='admin@parking.com',
-            password=generate_password_hash('admin123'),
+            password='admin123',
             role='admin',
             address='Admin Office',
             pincode='000000'
