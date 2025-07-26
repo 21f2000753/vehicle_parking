@@ -15,6 +15,7 @@
             --warning-color: #ffc107;
             --info-color: #17a2b8;
         }
+    
 
         body {
             background-color: #f5f7fa;
@@ -54,6 +55,10 @@
             font-size: 28px;
             font-weight: bold;
             color: var(--primary-color);
+        }
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
         }
 
         .lot-card {
@@ -103,7 +108,7 @@
             border: none;
             margin-top: 0.5rem;
             display: none;
-            z-index: 1000;
+            z-index: 1060; /* Changed from 1000 to 1060 */
         }
 
         .dropdown-menu.show {
@@ -143,10 +148,11 @@
         /* Search Section */
         .search-section {
             background: white;
-            padding: 2rem;
+            padding: 1rem;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             margin-bottom: 2rem;
+            max-width: 760px;
         }
 
         .search-input {
@@ -183,6 +189,7 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             margin-bottom: 2rem;
+            max-width: 760px;
         }
 
         .btn-success {
@@ -211,14 +218,14 @@
             background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             border: none;
             border-radius: 15px;
-            padding: 2rem;
+            padding: 3rem;
             margin-bottom: 2rem;
             box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
         }
 
         .active-reservation h5 {
             color: #856404;
-            margin-bottom: 1rem;
+            margin-bottom: 0.7rem;
             display: flex;
             align-items: center;
         }
@@ -316,6 +323,17 @@
         .badge.bg-secondary {
             background: linear-gradient(135deg, #6c757d 0%, #868e96 100%) !important;
         }
+        .active-reservation-fixed {
+            position: relative;
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto 2rem auto;
+            top: 140px;
+            right: 40px;
+            width: 320px;
+            z-index: 1040;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
 
         /* Modal Improvements */
         .modal-content {
@@ -323,6 +341,7 @@
             border: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
+        
 
         .modal-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, #4a6cf7 100%);
@@ -344,9 +363,17 @@
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
         }
+        .main-content-with-reservation {
+            margin-right: 360px; /* Creates space for the fixed reservation card */
+        }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        @media (max-width: 1200px) {
+            .main-content-with-reservation {
+                margin-right: 0; /* Remove margin on smaller screens */
+            }
         }
 
         /* Responsive */
@@ -356,40 +383,53 @@
                 flex-direction: column;
                 gap: 1rem;
             }
-            
+
             .main-container {
                 padding: 0 1rem;
+                padding-top: 100px;
+
             }
-            
+
             .search-section, .action-buttons, .history-section {
-                padding: 1.5rem;
+                padding: 1rem;
             }
-        }
+
+            #activeReservationSection {
+                position: relative !important;
+                width: 100% !important;
+                max-width: 760px;
+                margin: 0 auto 2rem auto;
+            }
+    }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header>
         <div class="header-content">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/parking_logo.jpg') }}" alt="ParkEasy Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%233a5cc9\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Ccircle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'%3E%3C/circle%3E%3Cpolyline points=\'21 15 16 10 5 21\'%3E%3C/polyline%3E%3C/svg%3E'">
-                <span class="logo-text">ParkEasy</span>
-            </div>
+            <a href="{{ url_for('home') }}" class="logo-link">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/parking_logo.jpg') }}" alt="ParkEasy Logo"
+                        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%233a5cc9\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Ccircle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'%3E%3C/circle%3E%3Cpolyline points=\'21 15 16 10 5 21\'%3E%3C/polyline%3E%3C/svg%3E'">
+                    <span class="logo-text">ParkEasy</span>
+                </div>
+            </a>
             
             <div class="profile-dropdown">
                 <button class="profile-btn" onclick="toggleProfileDropdown()">
                     <i class="fas fa-user-circle"></i>
                     Profile
-                    <i class="fas fa-chevron-down ms-2"></i>
+                    <!-- <i class="fas fa-chevron-down ms-2"></i> -->
                 </button>
                 <div class="dropdown-menu" id="profileDropdown">
+                    <div class="user-profile d-flex align-items-center gap-3 mb-3 p-3 bg-white rounded shadow-sm">
+                        <div>
+                            <div class="fw-bold">{{session.username}}</div>
+                        </div>
+                    </div>
                     <button class="dropdown-item" onclick="showParkingHistory()">
                         <i class="fas fa-history"></i>
                         Booking History
-                    </button>
-                    <button class="dropdown-item" onclick="showProfile()">
-                        <i class="fas fa-user"></i>
-                        My Profile
                     </button>
                     <div style="border-top: 1px solid #dee2e6; margin: 0.5rem 0;"></div>
                     <button class="dropdown-item text-danger" onclick="logout()">
@@ -418,25 +458,37 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons">
-            <div class="d-flex flex-wrap gap-3">
-                <button class="btn btn-success" onclick="autoAllocateSpot()">
-                    <i class="fas fa-magic me-2"></i>Auto-Allocate First Available
-                </button>
-                <button class="btn btn-info" onclick="toggleParkingHistory()">
-                    <i class="fas fa-history me-2"></i>View Parking History
+        <div class="d-flex justify-content-between align-items-start mb-4">
+        <!-- Action Buttons -->
+            <div class="action-buttons flex-grow-1">
+                <div class="d-flex flex-wrap gap-3">
+                    <button class="btn btn-success" onclick="autoAllocateSpot()">
+                        <i class="fas fa-magic me-2"></i>Auto-Allocate First Available
+                    </button>
+                    <button class="btn btn-info" onclick="toggleParkingHistory()">
+                        <i class="fas fa-history me-2"></i>View Parking History
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Reservation Card aligned to right corner -->
+            <div id="activeReservationSection" class="active-reservation shadow" style="display: none; margin-top: -160px;  width: 300px; padding: 1rem 1.25rem;;">
+                <h5><i class="fas fa-car"></i>Active Reservation</h5>
+                <div id="activeReservationDetails"style="font-size: 0.85rem; line-height: 0.9;"></div>
+                <button class="btn btn-danger mt-2" onclick="releaseSpot()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Release Spot
                 </button>
             </div>
         </div>
 
         <!-- Active Reservation Section -->
-        <div id="activeReservationSection" class="active-reservation" style="display: none;">
+        <!-- <div id="activeReservationSection" class="active-reservation active-reservation-fixed shadow" style="display: none;">
             <h5><i class="fas fa-car"></i>Active Reservation</h5>
             <div id="activeReservationDetails"></div>
             <button class="btn btn-danger mt-2" onclick="releaseSpot()">
                 <i class="fas fa-sign-out-alt me-2"></i>Release Spot
             </button>
-        </div>
+        </div> -->
 
         <!-- Parking History Section -->
         <div id="parkingHistorySection" class="history-section" style="display: none;">
@@ -464,7 +516,7 @@
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
                             Click on an <strong>available</strong> green spot to book.<br>
-                            Hourly rate: $<span id="pricePerHour"></span>
+                            Hourly rate: ₹ <span id="pricePerHour"></span>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -535,7 +587,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Bootstrap & JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -560,6 +612,55 @@
                 dropdown.classList.remove('show');
             }
         });
+
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'N/A';
+            
+            try {
+                // Handle different input formats
+                let date;
+                
+                // If it's already a formatted string from the backend (IST format)
+                if (dateTimeString.includes('-') && dateTimeString.includes(':') && !dateTimeString.includes('T')) {
+                    // Format: "2025-07-26 14:30:45" (already in IST from backend)
+                    return dateTimeString;
+                }
+                
+                // If it's an ISO string with Z (UTC)
+                if (dateTimeString.endsWith('Z')) {
+                    date = new Date(dateTimeString);
+                } 
+                // If it's an ISO string without timezone info
+                else if (dateTimeString.includes('T')) {
+                    date = new Date(dateTimeString + 'Z'); // Assume UTC
+                } 
+                // If it's already in a readable format
+                else {
+                    return dateTimeString;
+                }
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    console.error('Invalid date:', dateTimeString);
+                    return 'Invalid date';
+                }
+                
+                // Convert to IST and format
+                return date.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (error) {
+                console.error('Error formatting date:', error, 'Input:', dateTimeString);
+                return 'Invalid date';
+            }
+        }
 
         function showProfile() {
             alert('Profile functionality to be implemented');
@@ -606,111 +707,145 @@
             const section = document.getElementById('activeReservationSection');
             const details = document.getElementById('activeReservationDetails');
             
+            // Backend now returns formatted datetime strings
+            const checkInTime = data.parking_timestamp || 'N/A';
+            
             details.innerHTML = `
                 <p><strong>Location:</strong> ${data.lot_name}</p>
                 <p><strong>Spot Number:</strong> ${data.spot_number}</p>
+                <p><strong>Check-in:</strong> ${checkInTime}</p>
                 <p><strong>Duration:</strong> ${data.duration_hours} hours</p>
-                <p><strong>Current Cost:</strong> $${data.current_cost}</p>
-                <p><strong>Rate:</strong> $${data.price_per_hour}/hour</p>
+                <p><strong>Current Cost:</strong> ₹ ${data.current_cost}</p>
+                <p><strong>Rate:</strong> ₹ ${data.price_per_hour}/hour</p>
             `;
             
             section.style.display = 'block';
         }
-
+        
         function hideActiveReservation() {
-            document.getElementById('activeReservationSection').style.display = 'none';
+            const section = document.getElementById('activeReservationSection');
+            const mainContainer = document.querySelector('.main-container');
+            
+            section.style.display = 'none';
+            mainContainer.classList.remove('main-content-with-reservation'); // Remove spacing class
             activeReservationId = null;
         }
 
         function autoAllocateSpot() {
-            const modal = new bootstrap.Modal(document.getElementById('autoAllocationModal'));
-            modal.show();
-            
-            const searchInput = document.getElementById('autoSearchInput');
-            const resultsDiv = document.getElementById('autoAllocationResults');
-            
-            searchInput.oninput = function() {
-                const searchTerm = this.value;
-                if (searchTerm.length < 2) {
-                    resultsDiv.innerHTML = '';
-                    return;
-                }
-                
-                fetch(`/user/search_parking_lots?q=${encodeURIComponent(searchTerm)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        resultsDiv.innerHTML = '';
-                        
-                        data.forEach(lot => {
-                            if (lot.available > 0) {
-                                const lotDiv = document.createElement('div');
-                                lotDiv.className = 'card mb-2';
-                                lotDiv.innerHTML = `
-                                    <div class="card-body">
-                                        <h6>${lot.name}</h6>
-                                        <p>${lot.address}</p>
-                                        <p>${lot.available} spots available - $${lot.price_per_hour.toFixed(2)}/hour</p>
-                                        <button class="btn btn-primary btn-sm" onclick="allocateFirstAvailable(${lot.id}, '${lot.name}', ${lot.price_per_hour})">
-                                            Auto-Allocate Here
-                                        </button>
-                                    </div>
-                                `;
-                                resultsDiv.appendChild(lotDiv);
-                            }
-                        });
-                        
-                        if (resultsDiv.innerHTML === '') {
-                            resultsDiv.innerHTML = '<p class="text-muted">No available spots found.</p>';
-                        }
-                    })
-                    .catch(err => {
-                        resultsDiv.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
-                    });
-            };
-        }
-
-        function allocateFirstAvailable(lotId, lotName, pricePerHour) {
-            fetch(`/user/available_spots?lot_id=${lotId}`)
+            fetch('/user/active_reservation')
                 .then(res => res.json())
-                .then(spots => {
-                    const availableSpot = spots.find(spot => spot.status === 'A');
-                    if (!availableSpot) {
-                        alert('No available spots found');
+                .then(data => {
+                    if (data.active_reservation) {
+                        // Show error popup if user has active reservation
+                        alert('You already have an active reservation. Please release it before booking a new one.');
+                        return;
+                    }
+                const modal = new bootstrap.Modal(document.getElementById('autoAllocationModal'));
+                modal.show();
+                
+                const searchInput = document.getElementById('autoSearchInput');
+                const resultsDiv = document.getElementById('autoAllocationResults');
+                
+                searchInput.oninput = function() {
+                    const searchTerm = this.value;
+                    if (searchTerm.length < 2) {
+                        resultsDiv.innerHTML = '';
                         return;
                     }
                     
-                    // Book the first available spot
-                    fetch('/user/book_spot', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ spot_id: availableSpot.id })
-                    })
+                    fetch(`/user/search_parking_lots?q=${encodeURIComponent(searchTerm)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            resultsDiv.innerHTML = '';
+                            
+                            data.forEach(lot => {
+                                if (lot.available > 0) {
+                                    const lotDiv = document.createElement('div');
+                                    lotDiv.className = 'card mb-2';
+                                    lotDiv.innerHTML = `
+                                        <div class="card-body">
+                                            <h6>${lot.name}</h6>
+                                            <p>${lot.address}</p>
+                                            <p>${lot.available} spots available - ₹ ${lot.price_per_hour.toFixed(2)}/hour</p>
+                                            <button class="btn btn-primary btn-sm" onclick="allocateFirstAvailable(${lot.id}, '${lot.name}', ${lot.price_per_hour})">
+                                                Auto-Allocate Here
+                                            </button>
+                                        </div>
+                                    `;
+                                    resultsDiv.appendChild(lotDiv);
+                                }
+                            });
+                            
+                            if (resultsDiv.innerHTML === '') {
+                                resultsDiv.innerHTML = '<p class="text-muted">No available spots found.</p>';
+                            }
+                        })
+                        .catch(err => {
+                            resultsDiv.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
+                        });
+                };
+            })
+            .catch(err => {
+                console.error('Error checking active reservation:', err);
+                alert('Error checking reservation status. Please try again.');
+            });
+        }
+
+        function allocateFirstAvailable(lotId, lotName, pricePerHour) {
+            fetch('/user/active_reservation')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.active_reservation) {
+                        alert('You already have an active reservation. Please release it before booking a new one.');
+                        return;
+                    }
+                
+                fetch(`/user/available_spots?lot_id=${lotId}`)
                     .then(res => res.json())
-                    .then(data => {
-                        // Close auto-allocation modal
-                        const autoModal = bootstrap.Modal.getInstance(document.getElementById('autoAllocationModal'));
-                        autoModal.hide();
+                    .then(spots => {
+                        const availableSpot = spots.find(spot => spot.status === 'A');
+                        if (!availableSpot) {
+                            alert('No available spots found');
+                            return;
+                        }
                         
-                        // Show booking confirmation
-                        document.getElementById('bookingDetails').innerHTML = `
-                            <p><strong>Location:</strong> ${data.lot_name}</p>
-                            <p><strong>Spot Number:</strong> ${data.spot_number}</p>
-                            <p><strong>Price Per Hour:</strong> $${parseFloat(data.price_per_hour).toFixed(2)}</p>
-                            <p class="text-success"><strong>Auto-allocated first available spot!</strong></p>
-                        `;
-                        
-                        const confirmationModal = new bootstrap.Modal(document.getElementById('bookingConfirmationModal'));
-                        confirmationModal.show();
-                        
-                        // Refresh active reservation
-                        checkActiveReservation();
+                        // Book the first available spot
+                        fetch('/user/book_spot', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ spot_id: availableSpot.id })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            // Close auto-allocation modal
+                            const autoModal = bootstrap.Modal.getInstance(document.getElementById('autoAllocationModal'));
+                            autoModal.hide();
+                            
+                            // Show booking confirmation
+                            document.getElementById('bookingDetails').innerHTML = `
+                                <p><strong>Location:</strong> ${data.lot_name}</p>
+                                <p><strong>Spot Number:</strong> ${data.spot_number}</p>
+                                <p><strong>Price Per Hour:</strong> ₹ ${parseFloat(data.price_per_hour).toFixed(2)}</p>
+                                <p class="text-success"><strong>Auto-allocated first available spot!</strong></p>
+                            `;
+                            
+                            const confirmationModal = new bootstrap.Modal(document.getElementById('bookingConfirmationModal'));
+                            confirmationModal.show();
+                            
+                            // Refresh active reservation
+                            checkActiveReservation();
+                        })
+                        .catch(err => {
+                            alert('Auto-allocation failed: ' + err.message);
+                        });
                     })
                     .catch(err => {
-                        alert('Auto-allocation failed: ' + err.message);
+                        alert('Error finding available spots: ' + err.message);
                     });
                 })
                 .catch(err => {
-                    alert('Error finding available spots: ' + err.message);
+                    console.error('Error checking active reservation:', err);
+                    alert('Error checking reservation status. Please try again.');
                 });
         }
 
@@ -719,34 +854,29 @@
                 alert('No active reservation found');
                 return;
             }
-            
+
             if (!confirm('Are you sure you want to release this parking spot?')) {
                 return;
             }
-            
+
             fetch('/user/release_spot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reservation_id: activeReservationId })
             })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('releaseDetails').innerHTML = `
-                    <p><strong>Duration:</strong> ${data.duration_hours} hours</p>
-                    <p><strong>Total Cost:</strong> $${data.cost.toFixed(2)}</p>
-                `;
-                
-                const modal = new bootstrap.Modal(document.getElementById('releaseConfirmationModal'));
-                modal.show();
-                
-                // Hide active reservation section
-                hideActiveReservation();
-                
-                // Refresh search results if any
-                const searchTerm = document.getElementById('searchInput').value;
-                if (searchTerm) {
-                    searchParkingLots();
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(errData => {
+                        throw new Error(errData.error || 'Release failed');
+                    });
                 }
+                return res.json();
+            })
+            .then(data => {
+                // Save data to localStorage
+                localStorage.setItem('releaseData', JSON.stringify(data));
+                // Redirect to payment page
+                window.location.href = '/payment';
             })
             .catch(err => {
                 alert('Release failed: ' + err.message);
@@ -786,16 +916,17 @@
                         const historyItem = document.createElement('div');
                         historyItem.className = 'card mb-2';
                         
-                        const leavingTime = reservation.leaving_timestamp ? 
-                            new Date(reservation.leaving_timestamp).toLocaleString() : 'Still active';
+                        // Handle datetime formatting - backend now returns formatted strings
+                        const checkInTime = reservation.parking_timestamp || 'N/A';
+                        const checkOutTime = reservation.leaving_timestamp || (reservation.status === 'active' ? 'Still active' : 'N/A');
                         const cost = reservation.parking_cost ? 
-                            `$${parseFloat(reservation.parking_cost).toFixed(2)}` : 'N/A';
+                            `₹ ${parseFloat(reservation.parking_cost).toFixed(2)}` : 'N/A';
                         
                         historyItem.innerHTML = `
                             <div class="card-body">
                                 <h6>${reservation.lot_name} - Spot ${reservation.spot_number}</h6>
-                                <p><strong>Check-in:</strong> ${new Date(reservation.parking_timestamp).toLocaleString()}</p>
-                                <p><strong>Check-out:</strong> ${leavingTime}</p>
+                                <p><strong>Check-in:</strong> ${checkInTime}</p>
+                                <p><strong>Check-out:</strong> ${checkOutTime}</p>
                                 <p><strong>Status:</strong> <span class="badge ${reservation.status === 'active' ? 'bg-success' : 'bg-secondary'}">${reservation.status}</span></p>
                                 <p><strong>Cost:</strong> ${cost}</p>
                             </div>
@@ -804,6 +935,7 @@
                     });
                 })
                 .catch(err => {
+                    console.error('Error loading history:', err);
                     historyList.innerHTML = `<div class="alert alert-danger">Error loading history: ${err}</div>`;
                 });
         }
@@ -831,7 +963,7 @@
                                     <h5>${lot.name}</h5>
                                     <p>${lot.address}</p>
                                     <p><strong>${lot.available}</strong> Available / <strong>${lot.occupied}</strong> Occupied</p>
-                                    <p>$${lot.price_per_hour.toFixed(2)} per hour</p>
+                                    <p>₹ ${lot.price_per_hour.toFixed(2)} per hour</p>
                                     <button class="btn btn-primary" onclick="selectLot(${lot.id}, '${lot.name}', ${lot.price_per_hour})">Book Spot</button>
                                 </div>
                             </div>
@@ -845,48 +977,59 @@
         }
 
         function selectLot(lotId, lotName, pricePerHour) {
-            selectedLotId = lotId;
-            document.getElementById('lotName').textContent = lotName;
-            document.getElementById('pricePerHour').textContent = pricePerHour.toFixed(2);
-
-            const modal = new bootstrap.Modal(document.getElementById('reservationModal'));
-            modal.show();
-
-            const layoutContainer = document.getElementById('visualParkingLayout');
-            layoutContainer.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
-
-            fetch(`/user/available_spots?lot_id=${lotId}`)
+            fetch('/user/active_reservation')
                 .then(res => res.json())
                 .then(data => {
-                    layoutContainer.innerHTML = '';
-
-                    if (!data.length) {
-                        layoutContainer.innerHTML = `<div class="alert alert-warning">No available spots.</div>`;
+                    if (data.active_reservation) {
+                        alert('You already have an active reservation. Please release it before booking a new one.');
                         return;
                     }
+                selectedLotId = lotId;
+                document.getElementById('lotName').textContent = lotName;
+                document.getElementById('pricePerHour').textContent = pricePerHour.toFixed(2);
 
-                    data.forEach(spot => {
-                        const box = document.createElement('div');
-                        box.className = 'spot-box';
-                        box.textContent = spot.spot_number;
+                const modal = new bootstrap.Modal(document.getElementById('reservationModal'));
+                modal.show();
 
-                        if (spot.status === 'A') {
-                            box.classList.add('available');
-                            box.onclick = () => {
-                                selectedSpotId = spot.id;
-                                bookSpot();
-                            };
-                        } else {
-                            box.classList.add('occupied');
-                            box.title = 'Occupied';
+                const layoutContainer = document.getElementById('visualParkingLayout');
+                layoutContainer.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+
+                fetch(`/user/available_spots?lot_id=${lotId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        layoutContainer.innerHTML = '';
+
+                        if (!data.length) {
+                            layoutContainer.innerHTML = `<div class="alert alert-warning">No available spots.</div>`;
+                            return;
                         }
 
-                        layoutContainer.appendChild(box);
-                    });
+                        data.forEach(spot => {
+                            const box = document.createElement('div');
+                            box.className = 'spot-box';
+                            box.textContent = spot.spot_number;
 
+                            if (spot.status === 'A') {
+                                box.classList.add('available');
+                                box.onclick = () => {
+                                    selectedSpotId = spot.id;
+                                    bookSpot();
+                                };
+                            } else {
+                                box.classList.add('occupied');
+                                box.title = 'Occupied';
+                            }
+
+                            layoutContainer.appendChild(box);
+                        });
+
+                    })
+                    .catch(err => {
+                        layoutContainer.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
+                    });
                 })
                 .catch(err => {
-                    layoutContainer.innerHTML = `<div class="alert alert-danger">Error: ${err}</div>`;
+                    console.error('Error checking active reservation:', err);
                 });
         }
 
@@ -896,27 +1039,33 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ spot_id: selectedSpotId })
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    // 🚨 Forcefully trigger catch with error message
+                    return res.json().then(err => { throw err; });
+                }
+                return res.json();
+            })
             .then(data => {
+                // Show confirmation modal
                 const reservationModal = bootstrap.Modal.getInstance(document.getElementById('reservationModal'));
                 reservationModal.hide();
 
-                const safeLotName = document.createTextNode(data.lot_name).textContent;
                 document.getElementById('bookingDetails').innerHTML = `
-                    <p><strong>Location:</strong> ${safeLotName}</p>
+                    <p><strong>Location:</strong> ${data.lot_name}</p>
                     <p><strong>Spot Number:</strong> ${data.spot_number}</p>
-                    <p><strong>Price Per Hour:</strong> $${parseFloat(data.price_per_hour).toFixed(2)}</p>
+                    <p><strong>Price Per Hour:</strong> ₹ ${parseFloat(data.price_per_hour).toFixed(2)}</p>
                 `;
 
                 const confirmationModal = new bootstrap.Modal(document.getElementById('bookingConfirmationModal'));
                 confirmationModal.show();
 
-                // Refresh active reservation and search results
                 checkActiveReservation();
                 searchParkingLots();
             })
             .catch(err => {
-                alert('Booking failed: ' + err.message);
+                // 🚨 Show popup alert to user
+                alert(err.error || 'Booking failed. Please release active reservation first.');
             });
         }
 
@@ -925,5 +1074,6 @@
                 new bootstrap.Tooltip(el);
             });
     </script>
+
 </body>
 </html>

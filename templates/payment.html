@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkEasy - Payment System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a5cc9;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            padding: 2rem 0;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Payment Modal Styles */
+        .payment-option {
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(58, 92, 201, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .payment-option:hover::before {
+            left: 100%;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-color);
+            background-color: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 92, 201, 0.15);
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary-color);
+            background-color: #f8f9ff;
+            box-shadow: 0 4px 12px rgba(58, 92, 201, 0.15);
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 0.75rem;
+            transform: scale(1.2);
+        }
+
+        .payment-option input[type="radio"]:checked + label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .payment-option label {
+            cursor: pointer;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .payment-option label i {
+            font-size: 1.2rem;
+            width: 24px;
+        }
+
+        /* Bill Summary Styles */
+        .bill-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.95rem;
+        }
+
+        .bill-summary-item:last-child {
+            border-bottom: 2px solid var(--success-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--success-color);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .bill-summary-item .amount {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        /* Parking Summary Styles */
+        .parking-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        .parking-summary-row:hover {
+            background-color: #f8f9fa;
+            margin: 0 -1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-radius: 8px;
+        }
+
+        .parking-summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-label i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .summary-value {
+            color: #212529;
+            font-weight: 500;
+        }
+
+        /* Payment Success Animation */
+        .payment-success-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: var(--success-color);
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px var(--success-color);
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+            position: relative;
+        }
+
+        .success-checkmark .check-icon {
+            width: 56px;
+            height: 56px;
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            z-index: 1;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .success-checkmark .check-icon .icon-line {
+            height: 3px;
+            background-color: white;
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .success-checkmark .check-icon .icon-line.line-tip {
+            top: 28px;
+            left: 16px;
+            width: 12px;
+            transform: rotate(45deg);
+            animation: icon-line-tip .75s;
+        }
+
+        .success-checkmark .check-icon .icon-line.line-long {
+            top: 24px;
+            left: 21px;
+            width: 24px;
+            transform: rotate(-45deg);
+            animation: icon-line-long .75s;
+        }
+
+        .success-checkmark .check-icon .icon-circle {
+            top: -2px;
+            left: -2px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--success-color);
+            background: white;
+            position: absolute;
+            z-index: 0;
+        }
+
+        .success-checkmark .check-icon .icon-fix {
+            top: 10px;
+            width: 7px;
+            height: 40px;
+            background-color: white;
+            position: absolute;
+            left: 28px;
+            z-index: 1;
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 60px var(--success-color);
+            }
+        }
+
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes icon-line-tip {
+            0% {
+                width: 0;
+                left: 16px;
+                top: 32px;
+            }
+            54% {
+                width: 0;
+                left: 16px;
+                top: 32px;
+            }
+            70% {
+                width: 12px;
+                left: 16px;
+                top: 32px;
+            }
+            84% {
+                width: 18px;
+                left: 14px;
+                top: 30px;
+            }
+            100% {
+                width: 12px;
+                left: 16px;
+                top: 28px;
+            }
+        }
+
+        @keyframes icon-line-long {
+            0% {
+                width: 0;
+                right: 32px;
+                top: 37px;
+            }
+            65% {
+                width: 0;
+                right: 32px;
+                top: 37px;
+            }
+            84% {
+                width: 24px;
+                right: 15px;
+                top: 25px;
+            }
+            100% {
+                width: 24px;
+                right: 13px;
+                top: 24px;
+            }
+        }
+
+        /* Payment Button Enhancement */
+        .btn-payment {
+            background: linear-gradient(135deg, var(--success-color) 0%, #34ce57 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-payment::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-payment:hover::before {
+            left: 100%;
+        }
+
+        /* Receipt Styles */
+        .receipt-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .receipt-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--success-color);
+            border-top: 2px solid #dee2e6;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #dee2e6;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* Loading States */
+        .processing-payment {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .processing-payment .btn-payment {
+            background: #95a5a6;
+        }
+
+        /* Demo Button */
+        .demo-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #5a67d8 100%);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 92, 201, 0.3);
+            color: white;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .modal-dialog.modal-lg {
+                margin: 1rem;
+                max-width: none;
+            }
+            
+            .payment-option {
+                margin-bottom: 0.5rem;
+                padding: 0.75rem;
+            }
+            
+            .parking-summary-row {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            
+            .summary-value {
+                margin-top: 0.25rem;
+                font-size: 0.9rem;
+            }
+            
+            .success-checkmark {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .success-checkmark .check-icon {
+                width: 40px;
+                height: 40px;
+                left: 10px;
+                top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="demo-card text-center">
+                    <h1 class="mb-4"><i class="fas fa-parking me-3"></i>ParkEasy Payment System</h1>
+                    <p class="lead mb-4">Complete parking payment solution with payment processing and receipt generation</p>
+                    <button class="btn demo-btn" onclick="checkAndShowPaymentSummary()">
+                        <i class="fas fa-play me-2"></i>Pay Here
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Summary Modal -->
+    <div class="modal fade" id="paymentSummaryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-receipt me-2"></i>Parking Summary & Payment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Parking Details</h6>
+                                </div>
+                                <div class="card-body" id="parkingSummaryDetails">
+                                    <!-- Summary details will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Method</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="payment-option" data-method="credit_card">
+                                                <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="credit_card" checked>
+                                                <label class="form-check-label" for="creditCard">
+                                                    <i class="fas fa-credit-card me-2"></i>Credit Card
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="payment-option" data-method="debit_card">
+                                                <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" value="debit_card">
+                                                <label class="form-check-label" for="debitCard">
+                                                    <i class="fas fa-credit-card me-2"></i>Debit Card
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="payment-option" data-method="upi">
+                                                <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="upi">
+                                                <label class="form-check-label" for="upi">
+                                                    <i class="fas fa-mobile-alt me-2"></i>UPI Payment
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="payment-option" data-method="cash">
+                                                <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="cash">
+                                                <label class="form-check-label" for="cash">
+                                                    <i class="fas fa-money-bill-wave me-2"></i>Cash
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-calculator me-2"></i>Bill Summary</h6>
+                                </div>
+                                <div class="card-body" id="billSummary">
+                                    <!-- Bill summary will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-success btn-payment" onclick="processPayment()">
+                        <i class="fas fa-credit-card me-2"></i>Pay & Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Payment Successful</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="payment-success-animation mb-4">
+                        <div class="success-checkmark">
+                            <div class="check-icon">
+                                <span class="icon-line line-tip"></span>
+                                <span class="icon-line line-long"></span>
+                                <div class="icon-circle"></div>
+                                <div class="icon-fix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="text-success mb-3">Payment Completed Successfully!</h4>
+                    <div id="paymentReceiptDetails" class="text-start">
+                        <!-- Payment receipt details will be populated here -->
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        A receipt has been sent to your email address: <strong>demo@parkeasy.com</strong>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success me-2" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-2"></i>Done
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="downloadReceipt()">
+                        <i class="fas fa-download me-2"></i>Download Receipt
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="printReceipt()">
+                        <i class="fas fa-print me-2"></i>Print Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variable to store release data
+        
+
+        // Demo data for testing
+        let releaseData = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const storedData = localStorage.getItem('releaseData');
+            if (storedData) {
+                releaseData = JSON.parse(storedData);
+                showPaymentSummary(releaseData);
+            } else {
+                alert('No payment data found. Redirecting to dashboard...');
+                window.location.href = '/user_dashboard';
+            }
+        });
+
+        function processPayment() {
+            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            const paymentMethodValue = selectedPaymentMethod.value;
+            const modalBody = document.querySelector('#paymentSummaryModal .modal-body');
+            const paymentButton = document.querySelector('.btn-payment');
+            const originalText = paymentButton.innerHTML;
+
+            modalBody.classList.add('processing-payment');
+            paymentButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Payment...';
+            paymentButton.disabled = true;
+
+            setTimeout(() => {
+                modalBody.classList.remove('processing-payment');
+                paymentButton.innerHTML = originalText;
+                paymentButton.disabled = false;
+
+                const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentSummaryModal'));
+                paymentModal.hide();
+
+                showPaymentSuccess(paymentMethodValue);
+
+                // Clear stored release data
+                localStorage.removeItem('releaseData');
+            }, 3000);
+        }
+
+        function showPaymentSuccess(paymentMethod) {
+            const baseAmount = parseFloat(releaseData.cost);
+            const taxAmount = baseAmount * 0.18;
+            const totalAmount = baseAmount + taxAmount;
+            const transactionId = 'PKE' + Date.now().toString().slice(-8);
+            const currentDate = new Date().toLocaleString();
+
+            // 👇 Set the receipt data globally so it can be accessed later
+            window.receiptData = {
+                transactionId,
+                currentDate,
+                paymentMethod: formatPaymentMethod(paymentMethod),
+                lot_name: releaseData.lot_name,
+                spot_number: releaseData.spot_number,
+                duration_hours: releaseData.duration_hours,
+                baseAmount: baseAmount.toFixed(2),
+                taxAmount: taxAmount.toFixed(2),
+                totalAmount: totalAmount.toFixed(2)
+            };
+
+            const receiptDetails = document.getElementById('paymentReceiptDetails');
+            receiptDetails.innerHTML = `
+                <div class="receipt-card">
+                    <div class="receipt-header">
+                        <h5 class="mb-0">ParkEasy - Payment Receipt</h5>
+                        <small class="text-muted">Thank you for using our service!</small>
+                    </div>
+
+                    <div class="receipt-item"><span><strong>Transaction ID:</strong></span><span>${transactionId}</span></div>
+                    <div class="receipt-item"><span><strong>Date & Time:</strong></span><span>${currentDate}</span></div>
+                    <div class="receipt-item"><span><strong>Payment Method:</strong></span><span>${formatPaymentMethod(paymentMethod)}</span></div>
+                    <div class="receipt-item"><span><strong>Location:</strong></span><span>${releaseData.lot_name}</span></div>
+                    <div class="receipt-item"><span><strong>Spot Number:</strong></span><span>${releaseData.spot_number}</span></div>
+                    <div class="receipt-item"><span><strong>Duration:</strong></span><span>${releaseData.duration_hours} hours</span></div>
+                    <div class="receipt-item"><span><strong>Parking Charges:</strong></span><span>₹${baseAmount.toFixed(2)}</span></div>
+                    <div class="receipt-item"><span><strong>GST (18%):</strong></span><span>₹${taxAmount.toFixed(2)}</span></div>
+                    <div class="receipt-item"><span><strong>Total Paid:</strong></span><span>₹${totalAmount.toFixed(2)}</span></div>
+
+                    <div class="receipt-footer">
+                        <p class="mb-1">Visit us again for hassle-free parking!</p>
+                        <small>Support: support@parkeasy.com | +91-1234567890</small>
+                    </div>
+                </div>
+            `;
+
+            // 👇 Show the success modal
+            const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
+            successModal.show();
+
+            // Optional redirect after 5 seconds
+            setTimeout(() => {
+                window.location.href = "/user_dashboard";
+            }, 5000);
+        }
+        function formatPaymentMethod(method) {
+            const methods = {
+                'credit_card': 'Credit Card',
+                'debit_card': 'Debit Card',
+                'upi': 'UPI Payment',
+                'cash': 'Cash Payment'
+            };
+            return methods[method] || method.toUpperCase();
+        }
+
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'N/A';
+            
+            try {
+                // If backend returns formatted string (IST), use it directly
+                if (dateTimeString.includes('-') && dateTimeString.includes(':') && !dateTimeString.includes('T')) {
+                    return dateTimeString;
+                }
+                
+                // Handle ISO format with Z (UTC)
+                let date;
+                if (dateTimeString.endsWith('Z')) {
+                    date = new Date(dateTimeString);
+                } else if (dateTimeString.includes('T')) {
+                    date = new Date(dateTimeString + 'Z');
+                } else {
+                    return dateTimeString; // Already formatted
+                }
+                
+                if (isNaN(date.getTime())) {
+                    console.error('Invalid date:', dateTimeString);
+                    return 'Invalid date';
+                }
+                
+                return date.toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (error) {
+                console.error('Error formatting date:', error, 'Input:', dateTimeString);
+                return 'Invalid date';
+            }
+        }
+
+        
+       function downloadReceipt() {
+            if (!window.receiptData) {
+                alert('Receipt data not available');
+                return;
+            }
+            
+            const receiptContent = `
+        PARKEASY - PARKING RECEIPT
+        ========================
+
+        Transaction ID: ${window.receiptData.transactionId}
+        Date & Time: ${window.receiptData.currentDate}
+        Payment Method: ${window.receiptData.paymentMethod}
+
+        PARKING DETAILS
+        ---------------
+        Location: ${window.receiptData.lot_name}
+        Spot Number: ${window.receiptData.spot_number}
+        Duration: ${window.receiptData.duration_hours} hours
+
+        BILLING SUMMARY
+        ---------------
+        Parking Charges: ₹${window.receiptData.baseAmount}
+        GST (18%): ₹${window.receiptData.taxAmount}
+        Total Paid: ₹${window.receiptData.totalAmount}
+
+        Thank you for using ParkEasy!
+        Support: support@parkeasy.com | +91-1234567890
+            `;
+            
+            const blob = new Blob([receiptContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `parkeasy-receipt-${window.receiptData.transactionId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function printReceipt() {
+            const receiptContent = document.getElementById('paymentReceiptDetails').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>ParkEasy Receipt</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            .receipt-card { border: 2px solid #ccc; padding: 20px; }
+                            .receipt-header { text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 15px; }
+                            .receipt-item { display: flex; justify-content: space-between; padding: 5px 0; }
+                            .receipt-footer { text-align: center; margin-top: 15px; padding-top: 10px; border-top: 2px solid #ccc; }
+                        </style>
+                    </head>
+                    <body>
+                        ${receiptContent}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function showPaymentSummary(data) {
+            const summaryDetails = document.getElementById('parkingSummaryDetails');
+            
+            // Backend should now return properly formatted datetime strings
+            const parkingTime = data.parking_timestamp || 'N/A';
+            const leavingTime = data.leaving_timestamp || 'N/A';
+            
+            summaryDetails.innerHTML = `
+                <div class="parking-summary-row">
+                    <span class="summary-label"><i class="fas fa-map-marker-alt me-2"></i>Location:</span>
+                    <span class="summary-value">${data.lot_name}</span>
+                </div>
+                <div class="parking-summary-row">
+                    <span class="summary-label"><i class="fas fa-parking me-2"></i>Spot Number:</span>
+                    <span class="summary-value">${data.spot_number}</span>
+                </div>
+                <div class="parking-summary-row">
+                    <span class="summary-label"><i class="fas fa-sign-in-alt me-2"></i>Parking Time:</span>
+                    <span class="summary-value">${parkingTime}</span>
+                </div>
+                <div class="parking-summary-row">
+                    <span class="summary-label"><i class="fas fa-sign-out-alt me-2"></i>Leaving Time:</span>
+                    <span class="summary-value">${leavingTime}</span>
+                </div>
+                <div class="parking-summary-row">
+                    <span class="summary-label"><i class="fas fa-clock me-2"></i>Total Duration:</span>
+                    <span class="summary-value">${data.duration_hours} hours</span>
+                </div>
+            `;
+
+            // Calculate bill
+            const baseAmount = parseFloat(data.cost);
+            const taxRate = 0.18;
+            const taxAmount = baseAmount * taxRate;
+            const totalAmount = baseAmount + taxAmount;
+
+            const billSummary = document.getElementById('billSummary');
+            billSummary.innerHTML = `
+                <div class="bill-summary-item">
+                    <span>Parking Charges:</span>
+                    <span class="amount">₹${baseAmount.toFixed(2)}</span>
+                </div>
+                <div class="bill-summary-item">
+                    <span>GST (${(taxRate * 100)}%):</span>
+                    <span class="amount">₹${taxAmount.toFixed(2)}</span>
+                </div>
+                <div class="bill-summary-item">
+                    <span>Total Amount:</span>
+                    <span class="amount">₹${totalAmount.toFixed(2)}</span>
+                </div>
+            `;
+
+            // Setup payment option highlight
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.addEventListener('click', function () {
+                    this.querySelector('input[type="radio"]').checked = true;
+                    document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Show payment modal
+            const modal = new bootstrap.Modal(document.getElementById('paymentSummaryModal'));
+            modal.show();
+        }
+
+        function checkAndShowPaymentSummary() {
+            const storedData = localStorage.getItem('releaseData');
+            if (storedData) {
+                releaseData = JSON.parse(storedData);
+                showPaymentSummary(releaseData);
+            } else {
+                alert('No payment data found. Redirecting to dashboard...');
+                window.location.href = '/user_dashboard';
+            }
+        }
+
+    </script>
+</body>
+</html>

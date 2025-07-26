@@ -1,17 +1,10 @@
 from flask import current_app as app, jsonify, request, render_template, redirect, url_for
 from backend.models import db, User, ParkingLot, ParkingSpot, Reservation
 
-# Note: admin_dashboard route is likely defined elsewhere in the application
-# Remove this route to avoid the "AssertionError: View function mapping is overwriting an existing endpoint function"
-# @app.route("/admin_dashboard")
-# def admin_dashboard():
-#     return render_template("admin_dashboard.html")
-
 @app.route("/create_parking_lot", methods=["POST"])
 def create_parking_lot():
     data = request.form
     
-    # Create new parking lot in the database
     new_lot = ParkingLot(
         prime_location_name=data["prime_location_name"],
         price_per_hour=float(data["price_per_hour"]),
@@ -23,7 +16,6 @@ def create_parking_lot():
     db.session.add(new_lot)
     db.session.commit()
     
-    # Create parking spots for this lot
     for i in range(1, int(data["maximum_number_of_spots"]) + 1):
         spot = ParkingSpot(
             lot_id=new_lot.id,
@@ -73,34 +65,28 @@ def edit_parking_lot():
         data = request.form
         lot_id = data.get('id')
         
-        # Find parking lot by ID
         parking_lot = ParkingLot.query.get(lot_id)
         
         if parking_lot:
-            # Update parking lot details
             parking_lot.prime_location_name = data['name']
             parking_lot.address = data['address']
             parking_lot.pincode = data['pincode']
             parking_lot.price_per_hour = float(data['price_per_hour'])
-            
-            # Handle potential spot count changes
             old_max_spots = parking_lot.maximum_number_of_spots
             new_max_spots = int(data['maximum_number_of_spots'])
             parking_lot.maximum_number_of_spots = new_max_spots
             
             db.session.commit()
             
-            # Get current spots
             existing_spots = ParkingSpot.query.filter_by(lot_id=parking_lot.id).all()
             current_spot_count = len(existing_spots)
             
-            # If spot count increased, add new spots
             if new_max_spots > current_spot_count:
                 for i in range(current_spot_count + 1, new_max_spots + 1):
                     spot = ParkingSpot(
                         lot_id=parking_lot.id,
                         spot_number=str(i),
-                        status="A"  # Available
+                        status="A"
                     )
                     db.session.add(spot)
                 db.session.commit()
@@ -239,9 +225,10 @@ def get_active_bookings():
             'spot_number': spot.spot_number,
             'lot_id': lot.id,
             'lot_name': lot.prime_location_name,
-            'start_time': reservation.start_time.isoformat() if reservation.start_time else None,
-            'end_time': reservation.end_time.isoformat() if reservation.end_time else None,
-            'total_cost': reservation.total_cost
+            'start_time': reservation.parking_timestamp.isoformat() if reservation.parking_timestamp else None,
+            'end_time': reservation.leaving_timestamp.isoformat() if reservation.leaving_timestamp else None,
+            'total_cost': reservation.parking_cost if reservation.parking_cost else None,
+            'status': reservation.status
         })
     
     return jsonify(result)

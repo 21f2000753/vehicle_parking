@@ -4,19 +4,76 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .spot-box {
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            border-radius: 5px;
-            color: white;
-            font-size: 14px;
-            margin: 2px;
+        :root {
+            --primary-color: #3a5cc9;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-light: 0 2px 15px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-heavy: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
-        .available { background-color: green; }
-        .occupied { background-color: red; }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .spot-box {
+            width: 35px;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spot-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .spot-box:hover::before {
+            left: 100%;
+        }
+
+        .available { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: 2px solid #198754;
+        }
+        
+        .occupied { 
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            border: 2px solid #c82333;
+        }
+
+        .spot-box:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
         header {
             background-color: #fff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -25,178 +82,671 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
         }
-        
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
         .logo img {
             height: 40px;
             margin-right: 10px;
-        }
-        
+        }       
+
         .logo-text {
             font-size: 22px;
             font-weight: bold;
             color: #3a5cc9;
         }
-        .lot-card {
+
+        .container {
+            margin-top: 40px;
+        }
+
+        .nav-tabs {
+            border: none;
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 30px;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 10px;
+            margin: 0 5px;
+            padding: 12px 24px;
+            font-weight: 600;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-tabs .nav-link:not(.active) {
+            color: var(--secondary-color);
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            background: rgba(58, 92, 201, 0.1);
+            color: var(--primary-color);
+        }
+
+        .lot-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .lot-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .lot-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .lot-card h5 {
+            color: var(--dark-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lot-card h5::before {
+            content: '\f1b9';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .lot-info {
             margin-bottom: 20px;
         }
-        .lot-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+        .lot-info p {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--secondary-color);
+            font-weight: 500;
         }
-        @media (max-width: 600px) {
-            
+
+        .lot-info p strong {
+            color: var(--dark-color);
+            min-width: 80px;
+        }
+
+        .lot-info p i {
+            color: var(--primary-color);
+            width: 16px;
+            text-align: center;
+        }
+
+        .occupancy-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .occupancy-fill {
+            height: 100%;
+            background: var(--gradient-success);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .occupancy-fill.high {
+            background: linear-gradient(135deg, #ffc107, #ff6b35);
+        }
+
+        .occupancy-fill.full {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+
+        .spot-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px dashed #dee2e6;
+            position: relative;
+        }
+
+        .spot-container::before {
+            content: 'Parking Layout';
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: white;
+            padding: 0 10px;
+            font-size: 12px;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .btn-group-custom {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-custom {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-warning-custom {
+            background: linear-gradient(135deg, #ffc107, #ffb300);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-primary-custom {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(58, 92, 201, 0.3);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-lot-btn {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-lot-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-heavy);
+            background: linear-gradient(135deg, #5a6fd8 0%, #8b5fbf 100%);
+        }
+
+        .add-lot-btn i {
+            font-size: 18px;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .modal-header {
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border-bottom: none;
+            padding: 25px 30px;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(58, 92, 201, 0.25);
+        }
+
+        .alert {
+            border-radius: 15px;
+            border: none;
+            box-shadow: var(--shadow-light);
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+        #users-table-body tr:hover {
+            background-color: #eef1f9 !important;
+            transition: background-color 0.3s ease;
+        }
+
+        #users-table-body td {
+            padding: 12px 16px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .badge.bg-primary {
+            background-color: #4a90e2 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #e74c3c !important;
+        }
+        #users-table-body tr:nth-child(even) {
+            background-color: #f9f9fb;
+        }
+
+        #users-table-body tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+        }
+        .custom-user-table-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-user-table-header th {
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .custom-user-table-header th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .custom-user-table-header th:last-child {
+            border-top-right-radius: 12px;
+            border-right: none;
+        }
+        .custom-spots-table-header {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-spots-table-header th {
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .custom-spots-table-header th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .custom-spots-table-header th:last-child {
+            border-top-right-radius: 12px;
+            border-right: none;
+        }
+        /* Parking Spots Row Styling with User Table */
+        #spots-table-body td {
+            padding: 12px 16px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        #spots-table-body tr:nth-child(even) {
+            background-color: #f9f9fb;
+        }
+
+        #spots-table-body tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+        }
+
+        #spots-table-body tr:hover {
+            background-color: #eef1f9 !important;
+        }
+
+
+        @media (max-width: 768px) {  
             header {
                 flex-direction: column;
                 padding: 15px;
             }
-            nav {
-                margin-top: 15px;
-            }
             
-            nav a {
-                margin: 0 10px;
+            .logo-text {
+                font-size: 22px;
+            }
+
+            .lot-card {
+                margin-bottom: 20px;
+                padding: 20px;
+            }
+
+            .spot-box {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                margin: 2px;
+            }
+
+            .btn-group-custom {
+                justify-content: center;
+            }
+
+            .add-lot-btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 20px;
             }
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lot-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .lot-card:nth-child(2) { animation-delay: 0.1s; }
+        .lot-card:nth-child(3) { animation-delay: 0.2s; }
+        .lot-card:nth-child(4) { animation-delay: 0.3s; }
     </style>
 </head>
 <body>
 <header>
-    <div class="logo">
-        <img src="{{ url_for('static', filename='images/parking_logo.jpg') }}" alt="ParkEasy Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%233a5cc9\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Ccircle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'%3E%3C/circle%3E%3Cpolyline points=\'21 15 16 10 5 21\'%3E%3C/polyline%3E%3C/svg%3E'">
-        <span class="logo-text">ParkEasy</span>
-    </div>
+    <a href="{{ url_for('home') }}" class="logo-link">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/parking_logo.jpg') }}" alt="ParkEasy Logo"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%233a5cc9\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Ccircle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'%3E%3C/circle%3E%3Cpolyline points=\'21 15 16 10 5 21\'%3E%3C/polyline%3E%3C/svg%3E'">
+            <span class="logo-text">ParkEasy</span>
+        </div>
+    </a>
 </header>
-<div class="container mt-5">
 
+<div class="container mt-5">
     <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="lots-tab" data-bs-toggle="tab" data-bs-target="#lots" type="button" role="tab">Parking Lots</button>
+            <button class="nav-link active" id="lots-tab" data-bs-toggle="tab" data-bs-target="#lots" type="button" role="tab">
+                <i class="fas fa-car-side me-2"></i>Parking Lots
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">User Management</button>
+            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                <i class="fas fa-users me-2"></i>User Management
+            </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="spots-tab" data-bs-toggle="tab" data-bs-target="#spots" type="button" role="tab">Parking Spots</button>
+            <button class="nav-link" id="spots-tab" data-bs-toggle="tab" data-bs-target="#spots" type="button" role="tab">
+                <i class="fas fa-th-large me-2"></i>Parking Spots
+            </button>
         </li>
-        <!-- Add more tabs here if needed -->
     </ul>
 
     <div class="tab-content" id="dashboardTabContent">
         <!-- Parking Lots Tab -->
         <div class="tab-pane fade show active mt-4" id="lots" role="tabpanel" aria-labelledby="lots-tab">
-            <div class="d-flex justify-content-between mb-3">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLotModal">Add New Lot</button>
-                <button class="btn btn-secondary" id="refreshButton">Refresh Data</button>
+            <div class="d-flex justify-content-between mb-4">
+                <button class="btn add-lot-btn" data-bs-toggle="modal" data-bs-target="#addLotModal">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New Parking Lot
+                </button>
             </div>
             <div id="parking-lots-container" class="row"></div>
         </div>
         
         <!-- Users Tab -->
         <div class="tab-pane fade mt-4" id="users" role="tabpanel" aria-labelledby="users-tab">
-            <div class="d-flex justify-content-between mb-3">
-                <h4>Registered Users</h4>
-                <button class="btn btn-secondary" id="refreshUsersButton">Refresh Users</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Address</th>
-                            <th>Pincode</th>
-                            <th>Current Spot</th>
-                            <th>Lot Location</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-table-body">
-                        <!-- User data will be loaded here -->
-                    </tbody>
-                </table>
+            <div class="card shadow-sm p-4 bg-white rounded border-0">
+                <div class="mb-4">
+                    <input type="text" id="userSearch" class="form-control shadow-sm rounded-pill px-4 py-2" placeholder="🔍 Search by username or email...">
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover shadow-sm rounded-3 overflow-hidden">
+                        <thead class="text-white custom-user-table-header">
+                            <tr style="border-radius: 12px !important;">
+                                <th class="rounded-start px-4 py-3">ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Address</th>
+                                <th>Pincode</th>
+                                <th>Current Spot</th>
+                                <th class="rounded-end">Lot Location</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="bg-light">
+                            <!-- User data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <script>
+        document.getElementById('userSearch').addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('#users-table-body tr').forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+        </script>
+
+
         
         <!-- Parking Spots Management Tab -->
         <div class="tab-pane fade mt-4" id="spots" role="tabpanel" aria-labelledby="spots-tab">
-            <div class="d-flex justify-content-between mb-3">
-                <h4>Parking Spots Management</h4>
-                <div>
-                    <button class="btn btn-secondary me-2" id="refreshSpotsButton">Refresh Spots</button>
-                    <select id="lotFilterDropdown" class="form-select form-select-sm d-inline-block" style="width: auto;">
-                        <option value="all">All Lots</option>
-                        <!-- Lot options will be loaded here -->
-                    </select>
+            <div class="card shadow-sm p-4 bg-white rounded">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <select id="lotFilterDropdown" class="form-select form-select-sm d-inline-block" style="width: auto;">
+                            <option value="all">All Lots</option>
+                            <!-- Lot options will be loaded here -->
+                        </select>
+                    </div>
+                    <div>
+                        <span id="spotSummary" class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-parking text-primary"></i> Available: 0 | Occupied: 0
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Spot ID</th>
-                            <th>Lot Name</th>
-                            <th>Spot Number</th>
-                            <th>Status</th>
-                            <th>Current User</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="spots-table-body">
-                        <!-- Spots data will be loaded here -->
-                    </tbody>
-                </table>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <table class="table align-middle table-hover shadow-sm rounded-3 overflow-hidden">
+                            <tr>
+                                <th class="rounded-start px-4 py-3">Spot ID</th>
+                                <th>Lot Name</th>
+                                <th>Spot Number</th>
+                                <th>Status</th>
+                                <th class="rounded-end">Current User</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spots-table-body" class="bg-light">
+                            <!-- Spots data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+
 
 <!-- Add New Lot Modal -->
 <div class="modal fade" id="addLotModal" tabindex="-1" aria-labelledby="addLotModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <form method="POST" action="/create_parking_lot" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addLotModalLabel">Create New Parking Lot</h5>
+                <h5 class="modal-title" id="addLotModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Create New Parking Lot
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-2">
-                    <label class="form-label">Prime Location Name</label>
-                    <input type="text" name="prime_location_name" class="form-control" required>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            Prime Location Name
+                        </label>
+                        <input type="text" name="prime_location_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-rupee-sign me-2"></i>
+                            Price per Hour
+                        </label>
+                        <input type="number" step="0.01" name="price_per_hour" class="form-control" required>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">Price per Hour</label>
-                    <input type="number" step="0.01" name="price_per_hour" class="form-control" required>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-home me-2"></i>
+                            Address
+                        </label>
+                        <textarea name="address" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-mail-bulk me-2"></i>
+                            Pincode
+                        </label>
+                        <input type="text" name="pincode" class="form-control" required>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <label class="form-label">Address</label>
-                    <textarea name="address" class="form-control" required></textarea>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Pincode</label>
-                    <input type="text" name="pincode" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Maximum Number of Spots</label>
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-hashtag me-2"></i>
+                        Maximum Number of Spots
+                    </label>
                     <input type="number" name="maximum_number_of_spots" class="form-control" required>
                 </div>
-                <div class="form-check mb-2">
+                <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" name="auto_create_spots" id="autoCreateSpots" checked>
                     <label class="form-check-label" for="autoCreateSpots">
+                        <i class="fas fa-magic me-2"></i>
                         Automatically create parking spots based on maximum capacity
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Create Lot</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-custom btn-primary-custom">
+                    <i class="fas fa-save me-2"></i>
+                    Create Lot
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancel
+                </button>
             </div>
         </form>
     </div>
@@ -205,7 +755,7 @@
 <!-- Bootstrap + JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Parking Lots Loader Script -->
+<!-- Parking Lots Loader Script (Same Logic, Enhanced UI) -->
 <script>
     async function loadLots() {
         try {
@@ -215,39 +765,67 @@
             container.innerHTML = '';
 
             if (lots.length === 0) {
-                container.innerHTML = '<div class="col-12"><div class="alert alert-info">No parking lots available. Click "Add New Lot" to create one.</div></div>';
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle me-3 fs-4"></i>
+                            <div>
+                                <strong>No parking lots available.</strong><br>
+                                Click "Add New Parking Lot" to create your first parking facility.
+                            </div>
+                        </div>
+                    </div>`;
                 return;
             }
 
-            lots.forEach(lot => {
+            lots.forEach((lot, index) => {
                 const lotCol = document.createElement('div');
-                lotCol.className = 'col-md-6 col-lg-4';
+                lotCol.className = 'col-md-6 col-xl-4';
                 
                 const lotBox = document.createElement('div');
-                lotBox.className = 'p-3 border rounded lot-card';
-                lotBox.style.height = '100%';
+                lotBox.className = 'lot-card';
+                lotBox.style.animationDelay = `${index * 0.1}s`;
+
+                // Calculate occupancy percentage
+                const occupancyPercentage = (lot.occupied / lot.max_spots) * 100;
+                let occupancyClass = '';
+                if (occupancyPercentage >= 90) occupancyClass = 'full';
+                else if (occupancyPercentage >= 70) occupancyClass = 'high';
 
                 let html = `
                     <h5>${lot.name}</h5>
-                    <p><strong>Address:</strong> ${lot.address}</p>
-                    <p><strong>Pincode:</strong> ${lot.pincode}</p>
-                    <p><strong>Price/hr:</strong> ₹${lot.price_per_hour}</p>
-                    <p><strong>Occupied:</strong> ${lot.occupied}/${lot.max_spots}</p>
-                    <div class="spot-container d-flex flex-wrap" style="gap: 5px;">`;
+                    <div class="lot-info">
+                        <p><i class="fas fa-map-marker-alt"></i><strong>Address:</strong> ${lot.address}</p>
+                        <p><i class="fas fa-mail-bulk"></i><strong>Pincode:</strong> ${lot.pincode}</p>
+                        <p><i class="fas fa-rupee-sign"></i><strong>Price/hr:</strong> ₹ ${lot.price_per_hour}</p>
+                        <p><i class="fas fa-chart-pie"></i><strong>Occupancy:</strong> ${lot.occupied}/${lot.max_spots} spots</p>
+                        <div class="occupancy-bar">
+                            <div class="occupancy-fill ${occupancyClass}" style="width: ${occupancyPercentage}%"></div>
+                        </div>
+                    </div>
+                    <div class="spot-container d-flex flex-wrap justify-content-center">`;
 
                 // Create spot matrix - ensure we show the correct number of spots
                 for (let i = 0; i < lot.max_spots; i++) {
                     const spotData = lot.spots[i] || { spot_number: i+1, status: 'A' };
                     const statusClass = spotData.status === 'O' ? 'occupied' : 'available';
                     const label = spotData.spot_number;
-                    html += `<div class="spot-box ${statusClass}" title="Spot ${label}">${spotData.status}</div>`;
+                    const statusText = spotData.status === 'O' ? 'Occupied' : 'Available';
+                    html += `<div class="spot-box ${statusClass}" title="Spot ${label} - ${statusText}">${spotData.status}</div>`;
                 }
 
                 html += `</div>
-                    <div class="mt-3">
-                        <a href="/edit_parking_lot?id=${lot.id}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="/delete_parking_lot?id=${lot.id}" class="btn btn-sm btn-danger">Delete</a>
-                        <button class="btn btn-sm btn-success" onclick="manageSpots(${lot.id})">Manage Spots</button>
+                    <div class="btn-group-custom mt-4">
+                        <a href="/edit_parking_lot?id=${lot.id}" class="btn btn-custom btn-warning-custom">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <a href="/delete_parking_lot?id=${lot.id}" class="btn btn-custom btn-danger-custom" 
+                           onclick="return confirm('Are you sure you want to delete this parking lot?')">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </a>
+                        <button class="btn btn-custom btn-success-custom" onclick="manageSpots(${lot.id})">
+                            <i class="fas fa-cogs me-1"></i>Manage
+                        </button>
                     </div>
                 `;
 
@@ -258,9 +836,18 @@
         } catch (err) {
             console.error("Failed to load lots:", err);
             document.getElementById('parking-lots-container').innerHTML = 
-                '<div class="col-12"><div class="alert alert-danger">Error loading parking lots. Please try again.</div></div>';
+                `<div class="col-12">
+                    <div class="alert alert-danger d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                        <div>
+                            <strong>Error loading parking lots.</strong><br>
+                            Please check your connection and try again.
+                        </div>
+                    </div>
+                </div>`;
         }
     }
+
     
     // Function to redirect to the spots tab with the selected lot
     function manageSpots(lotId) {
@@ -312,10 +899,6 @@
                     <td>${user.pincode || 'N/A'}</td>
                     <td>${booking ? `#${booking.spot_number}` : 'None'}</td>
                     <td>${booking ? booking.lot_name : 'N/A'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" onclick="editUser(${user.id})">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button>
-                    </td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -326,19 +909,6 @@
         }
     }
 
-    // Placeholder functions for user actions
-    function editUser(userId) {
-        alert(`Edit user functionality for user ID: ${userId} - Implement as needed`);
-        // Implement with actual form or redirect to edit page
-    }
-
-    function deleteUser(userId) {
-        if (confirm(`Are you sure you want to delete user with ID: ${userId}?`)) {
-            // Implement actual delete functionality
-            alert('Delete operation would happen here');
-        }
-    }
-
     // Function to load parking spots
     async function loadParkingSpots(lotId = 'all') {
         try {
@@ -346,11 +916,9 @@
             const res = await fetch(endpoint);
             const spots = await res.json();
             
-            // Also get active bookings to show current users
             const bookingsRes = await fetch('/active_bookings');
             const bookings = await bookingsRes.json();
             
-            // Create a mapping of spot ID to booking
             const spotBookings = {};
             bookings.forEach(booking => {
                 spotBookings[booking.spot_id] = booking;
@@ -359,48 +927,56 @@
             const tableBody = document.getElementById('spots-table-body');
             tableBody.innerHTML = '';
 
+            let availableCount = 0, occupiedCount = 0;
+
             if (spots.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No parking spots found.</td></tr>';
-                return;
+            } else {
+                spots.forEach(spot => {
+                    const booking = spotBookings[spot.id] || null;
+                    const row = document.createElement('tr');
+                    
+                    if (spot.status === 'O') {
+                        row.style.backgroundColor = '#fdeaea';  // soft red
+                        occupiedCount++;
+                    } else {
+                        row.style.backgroundColor = '#eafaf1';  // soft green
+                        availableCount++;
+                    }
+
+
+                    row.innerHTML = `
+                        <td>${spot.id}</td>
+                        <td>${spot.lot_name}</td>
+                        <td>${spot.spot_number}</td>
+                        <td>
+                            <span class="badge ${spot.status === 'O' ? 'bg-danger' : 'bg-success'}">
+                                <i class="fas ${spot.status === 'O' ? 'fa-times-circle' : 'fa-check-circle'} me-1"></i>
+                                ${spot.status === 'O' ? 'Occupied' : 'Available'}
+                            </span>
+                        </td>
+                        <td>${booking ? booking.username : 'None'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
             }
 
-            spots.forEach(spot => {
-                const booking = spotBookings[spot.id] || null;
-                const row = document.createElement('tr');
-                
-                // Highlight row based on status
-                if (spot.status === 'O') {
-                    row.classList.add('table-danger');
-                } else {
-                    row.classList.add('table-success');
-                }
-                
-                row.innerHTML = `
-                    <td>${spot.id}</td>
-                    <td>${spot.lot_name}</td>
-                    <td>${spot.spot_number}</td>
-                    <td>
-                        <span class="badge ${spot.status === 'O' ? 'bg-danger' : 'bg-success'}">
-                            ${spot.status === 'O' ? 'Occupied' : 'Available'}
-                        </span>
-                    </td>
-                    <td>${booking ? booking.username : 'None'}</td>
-                    <td>
-                        <button class="btn btn-sm btn-info" onclick="viewSpotDetails(${spot.id})">View</button>
-                        ${spot.status === 'A' ? 
-                            `<button class="btn btn-sm btn-danger" onclick="deleteSpot(${spot.id})">Delete</button>` : 
-                            `<button class="btn btn-sm btn-danger" disabled title="Cannot delete occupied spot">Delete</button>`
-                        }
-                    </td>
+            // Update summary
+            const summary = document.getElementById("spotSummary");
+            if (summary) {
+                summary.innerHTML = `
+                    <i class="fas fa-parking text-primary"></i>
+                    Available: ${availableCount} | Occupied: ${occupiedCount}
                 `;
-                tableBody.appendChild(row);
-            });
+            }
+
         } catch (err) {
             console.error("Failed to load parking spots:", err);
             document.getElementById('spots-table-body').innerHTML = 
-                '<tr><td colspan="6" class="text-center text-danger">Error loading parking spots. Please try again.</td></tr>';
+                '<tr><td colspan="9" class="text-center text-danger">Error loading parking spots. Please try again.</td></tr>';
         }
     }
+
 
 
     
@@ -427,35 +1003,7 @@
         }
     }
     
-    // Functions for spot management
-    function viewSpotDetails(spotId) {
-        // Implement view spot details functionality
-        alert(`View details for spot ID: ${spotId}`);
-    }
     
-    async function deleteSpot(spotId) {
-        if (confirm(`Are you sure you want to delete parking spot with ID: ${spotId}?`)) {
-            try {
-                const res = await fetch(`/delete_parking_spot?id=${spotId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (res.ok) {
-                    alert('Parking spot deleted successfully');
-                    // Reload spots after deletion
-                    const lotDropdown = document.getElementById('lotFilterDropdown');
-                    loadParkingSpots(lotDropdown.value);
-                } else {
-                    alert('Failed to delete parking spot');
-                }
-            } catch (err) {
-                console.error("Error deleting spot:", err);
-                alert('Error occurred while deleting parking spot');
-            }
-        }
-    }
-
-
     
     document.addEventListener("DOMContentLoaded", () => {
         // Load parking lots data
@@ -466,14 +1014,6 @@
         document.getElementById('spots-tab').addEventListener('click', () => {
             populateLotDropdown();
             loadParkingSpots();
-        });
-        
-        // Add refresh button functionality
-        document.getElementById('refreshButton').addEventListener('click', loadLots);
-        document.getElementById('refreshUsersButton').addEventListener('click', loadUsers);
-        document.getElementById('refreshSpotsButton').addEventListener('click', () => {
-            const lotDropdown = document.getElementById('lotFilterDropdown');
-            loadParkingSpots(lotDropdown.value);
         });
         
         // Add lot filter dropdown functionality

@@ -1,4 +1,4 @@
-from flask import current_app as app, jsonify, request,render_template, redirect, url_for, session
+from flask import current_app as app, jsonify, request, render_template, redirect, url_for, session, flash
 from backend.models import db, User
 
 @app.route('/')
