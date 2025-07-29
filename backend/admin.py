@@ -129,13 +129,24 @@ def delete_parking_lot():
         ).first()
         
         if parking_lot:
-            # First delete all associated spots
+            # Check if any spots in this lot are occupied
+            occupied_spots = ParkingSpot.query.filter_by(
+                lot_id=parking_lot.id, 
+                status='O'
+            ).count()
+            
+            if occupied_spots > 0:
+                flash(f'Cannot delete parking lot "{parking_lot.prime_location_name}". {occupied_spots} spots are currently occupied.', 'error')
+                return redirect(url_for('admin_dashboard'))
+            
+            # First delete all associated spots (only if all are empty)
             ParkingSpot.query.filter_by(lot_id=parking_lot.id).delete()
             
             # Then delete the parking lot
             db.session.delete(parking_lot)
             db.session.commit()
             
+            flash(f'Parking lot "{parking_lot.prime_location_name}" has been successfully deleted.', 'success')
             return redirect(url_for("admin_dashboard"))
         else:
             return jsonify({'error': 'Parking lot not found'}), 404

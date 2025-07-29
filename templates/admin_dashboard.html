@@ -502,7 +502,149 @@
         #spots-table-body tr:hover {
             background-color: #eef1f9 !important;
         }
+        /* Admin Header Controls */
+        .admin-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
+        .admin-welcome {
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-logout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-logout:hover::before {
+            left: 100%;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+            background: linear-gradient(135deg, #e74c3c, #dc3545);
+        }
+
+        .btn-logout:active {
+            transform: translateY(0);
+        }
+
+        /* Logout Modal Styles */
+        .logout-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+        }
+
+        .logout-modal .modal-header {
+            background: var(--gradient-primary);
+            color: white;
+            border-bottom: none;
+            padding: 25px 30px;
+        }
+
+        .logout-modal .modal-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .logout-modal .modal-body {
+            padding: 30px;
+        }
+
+        .logout-modal .modal-footer {
+            padding: 20px 30px;
+            border-top: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+                align-items: center;
+            }
+            
+            .admin-welcome {
+                font-size: 13px;
+                text-align: center;
+            }
+            
+            .btn-logout {
+                padding: 8px 20px;
+                font-size: 13px;
+                width: auto;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            .logout-modal .modal-dialog {
+                margin: 1rem;
+            }
+            
+            .logout-modal .modal-body {
+                padding: 20px;
+            }
+            
+            .logout-modal .modal-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logout-modal .btn-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-welcome {
+                font-size: 12px;
+            }
+            
+            .btn-logout {
+                font-size: 12px;
+                padding: 6px 16px;
+            }
+        }
 
         @media (max-width: 768px) {  
             header {
@@ -555,6 +697,89 @@
         .lot-card:nth-child(2) { animation-delay: 0.1s; }
         .lot-card:nth-child(3) { animation-delay: 0.2s; }
         .lot-card:nth-child(4) { animation-delay: 0.3s; }
+        /* Custom Tooltip Styles */
+        .tooltip {
+            font-size: 13px;
+        }
+
+        .tooltip-inner {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
+            max-width: 250px;
+            text-align: center;
+        }
+
+        .tooltip.bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: #dc3545;
+        }
+
+        .tooltip-content {
+            line-height: 1.4;
+        }
+
+        .tooltip-content strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .tooltip-content small {
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        /* Enhanced disabled button styling */
+        .btn-custom.btn-secondary.disabled-delete-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom.btn-secondary.disabled-delete-btn:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            opacity: 0.8;
+        }
+
+        .btn-custom.btn-secondary.disabled-delete-btn::before {
+            display: none; /* Remove shine effect on disabled buttons */
+        }
+
+        /* Add a subtle warning animation on hover */
+        .disabled-delete-btn:hover {
+            animation: subtle-shake 0.5s ease-in-out;
+        }
+
+        /* Enhanced tooltip z-index and pointer events */
+        .tooltip {
+            font-size: 13px;
+            z-index: 9999 !important;
+        }
+
+        .tooltip-inner {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
+            max-width: 250px;
+            text-align: center;
+        }
+
+        .disabled-delete-btn {
+            pointer-events: auto !important; /* Ensure disabled buttons can still show tooltips */
+        }
+
+        @keyframes subtle-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
     </style>
 </head>
 <body>
@@ -566,6 +791,13 @@
             <span class="logo-text">ParkEasy</span>
         </div>
     </a>
+    <div class="admin-controls">
+        <span class="admin-welcome">Welcome, Admin</span>
+        <button class="btn-logout" onclick="confirmLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
 </header>
 
 <div class="container mt-5">
@@ -819,10 +1051,27 @@
                         <a href="/edit_parking_lot?id=${lot.id}" class="btn btn-custom btn-warning-custom">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
-                        <a href="/delete_parking_lot?id=${lot.id}" class="btn btn-custom btn-danger-custom" 
-                           onclick="return confirm('Are you sure you want to delete this parking lot?')">
+                    ${lot.occupied > 0 
+                        ? `<button class="btn btn-custom btn-secondary disabled-delete-btn" 
+                                    disabled 
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-placement="top" 
+                                    data-bs-html="true"
+                                    title="<div class='tooltip-content'>
+                                            <strong><i class='fas fa-ban'></i> Cannot Delete</strong><br>
+                                            <span class='text-warning'>${lot.occupied} spots currently occupied</span><br>
+                                            <small>Wait for all users to vacate before deleting</small>
+                                            </div>">
+                                <i class="fas fa-ban me-1"></i>Delete (${lot.occupied} occupied)
+                            </button>`
+                        : `<a href="/delete_parking_lot?id=${lot.id}" class="btn btn-custom btn-danger-custom" 
+                            onclick="return confirmDelete('${lot.name}', ${lot.occupied})"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Delete this parking lot permanently">
                             <i class="fas fa-trash me-1"></i>Delete
-                        </a>
+                        </a>`
+}
                         <button class="btn btn-custom btn-success-custom" onclick="manageSpots(${lot.id})">
                             <i class="fas fa-cogs me-1"></i>Manage
                         </button>
@@ -833,6 +1082,7 @@
                 lotCol.appendChild(lotBox);
                 container.appendChild(lotCol);
             });
+            setTimeout(initializeTooltips, 100);
         } catch (err) {
             console.error("Failed to load lots:", err);
             document.getElementById('parking-lots-container').innerHTML = 
@@ -848,8 +1098,48 @@
         }
     }
 
-    
-    // Function to redirect to the spots tab with the selected lot
+// Add this function to handle delete confirmation
+    function confirmDelete(lotName, occupiedCount) {
+        if (occupiedCount > 0) {
+            alert(`Cannot delete "${lotName}". ${occupiedCount} spots are currently occupied. Please wait for all users to vacate their spots before deleting this parking lot.`);
+            return false;
+        }
+        return confirm(`⚠️ Are you sure you want to delete "${lotName}"?\n\nThis action will:\n• Permanently remove the parking lot\n• Delete all associated parking spots\n• Cannot be undone\n\nClick OK to confirm deletion.`);
+    }
+
+    // Add this function to initialize tooltips
+    // Enhanced tooltip initialization function
+    function initializeTooltips() {
+        // Dispose of ALL existing tooltips first
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            const existingTooltip = bootstrap.Tooltip.getInstance(el);
+            if (existingTooltip) {
+                existingTooltip.dispose();
+            }
+        });
+        
+        // Initialize new tooltips with enhanced options
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover focus',
+                delay: { show: 200, hide: 100 },
+                html: true,
+                placement: 'top',
+                boundary: 'viewport'
+            });
+        });
+    }
+
+    // Also add this at the end of your loadLots() function, replace the existing setTimeout:
+    setTimeout(() => {
+        initializeTooltips();
+        // Force re-initialization after DOM is fully updated
+        requestAnimationFrame(() => {
+            initializeTooltips();
+        });
+    }, 200);
+        // Function to redirect to the spots tab with the selected lot
     function manageSpots(lotId) {
         // Select the spots tab
         document.getElementById('spots-tab').click();
@@ -1003,7 +1293,126 @@
         }
     }
     
-    
+    // Logout Confirmation Modal
+    function confirmLogout() {
+        // Remove any existing logout modal
+        const existingModal = document.querySelector('.logout-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Create custom confirmation modal
+        const modal = document.createElement('div');
+        modal.className = 'modal fade logout-modal';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Confirm Logout
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <i class="fas fa-question-circle text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h6 class="mb-3">Are you sure you want to logout?</h6>
+                        <p class="text-muted mb-0 small">You will be redirected to the login page.</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-custom btn-secondary-custom" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="button" class="btn btn-custom btn-danger-custom" onclick="performLogout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Yes, Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        
+        // Remove modal from DOM when hidden
+        modal.addEventListener('hidden.bs.modal', () => {
+            modal.remove();
+        });
+    }
+
+    // Perform Logout Function
+    async function performLogout() {
+        try {
+            // Get logout button and show loading state
+            const logoutBtn = document.querySelector('.logout-modal .btn-danger-custom');
+            const originalText = logoutBtn.innerHTML;
+            logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Logging out...';
+            logoutBtn.disabled = true;
+            
+            // Disable cancel button
+            const cancelBtn = document.querySelector('.logout-modal .btn-secondary-custom');
+            cancelBtn.disabled = true;
+            
+            // Make logout request to your existing endpoint
+            const response = await fetch('/logout', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                // Show success state
+                logoutBtn.innerHTML = '<i class="fas fa-check me-1"></i>Logged out!';
+                logoutBtn.className = 'btn btn-custom btn-success-custom';
+                
+                // Close modal after short delay
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.querySelector('.logout-modal'));
+                    if (modal) modal.hide();
+                    
+                    // Redirect to login page
+                    window.location.href = '/login';
+                }, 1500);
+            } else {
+                throw new Error('Logout request failed');
+            }
+            
+        } catch (error) {
+            console.error('Logout error:', error);
+            
+            // Show error state
+            const logoutBtn = document.querySelector('.logout-modal .btn-danger-custom');
+            const cancelBtn = document.querySelector('.logout-modal .btn-secondary-custom');
+            
+            logoutBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Error';
+            logoutBtn.className = 'btn btn-custom btn-warning-custom';
+            
+            // Re-enable buttons
+            logoutBtn.disabled = false;
+            cancelBtn.disabled = false;
+            
+            // Show error message
+            alert('Logout failed. Please try again.');
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt me-1"></i>Yes, Logout';
+                logoutBtn.className = 'btn btn-custom btn-danger-custom';
+            }, 2000);
+        }
+}
+
+// Alternative: Simple Direct Logout (without confirmation modal)
+    function directLogout() {
+        // Show loading in header button
+        const headerLogoutBtn = document.querySelector('.btn-logout');
+        const originalText = headerLogoutBtn.innerHTML;
+        headerLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+        headerLogoutBtn.disabled = true;
+        
+        // Direct redirect to logout
+        window.location.href = '/logout';
+    }
     
     document.addEventListener("DOMContentLoaded", () => {
         // Load parking lots data
