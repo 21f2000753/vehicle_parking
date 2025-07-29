@@ -457,7 +457,6 @@
         </div>
     </div>
 
-    <!-- Payment Summary Modal -->
     <div class="modal fade" id="paymentSummaryModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -526,7 +525,6 @@
                                     <h6 class="mb-0"><i class="fas fa-calculator me-2"></i>Bill Summary</h6>
                                 </div>
                                 <div class="card-body" id="billSummary">
-                                    <!-- Bill summary will be populated here -->
                                 </div>
                             </div>
                         </div>
@@ -544,7 +542,6 @@
         </div>
     </div>
 
-    <!-- Payment Success Modal -->
     <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -565,7 +562,6 @@
                     </div>
                     <h4 class="text-success mb-3">Payment Completed Successfully!</h4>
                     <div id="paymentReceiptDetails" class="text-start">
-                        <!-- Payment receipt details will be populated here -->
                     </div>
                     <div class="alert alert-info mt-3">
                         <i class="fas fa-info-circle me-2"></i>
@@ -588,11 +584,8 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Global variable to store release data
-        
+    <script>        
 
-        // Demo data for testing
         let releaseData = null;
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -645,7 +638,6 @@
             const transactionId = 'PKE' + Date.now().toString().slice(-8);
             const currentDate = new Date().toLocaleString();
 
-            // 👇 Set the receipt data globally so it can be accessed later
             window.receiptData = {
                 transactionId,
                 currentDate,
@@ -683,11 +675,9 @@
                 </div>
             `;
 
-            // 👇 Show the success modal
             const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
             successModal.show();
 
-            // Optional redirect after 5 seconds
             setTimeout(() => {
                 window.location.href = "/user_dashboard";
             }, 5000);
@@ -706,12 +696,10 @@
             if (!dateTimeString) return 'N/A';
             
             try {
-                // If backend returns formatted string (IST), use it directly
                 if (dateTimeString.includes('-') && dateTimeString.includes(':') && !dateTimeString.includes('T')) {
                     return dateTimeString;
                 }
                 
-                // Handle ISO format with Z (UTC)
                 let date;
                 if (dateTimeString.endsWith('Z')) {
                     date = new Date(dateTimeString);
@@ -811,7 +799,6 @@
         function showPaymentSummary(data) {
             const summaryDetails = document.getElementById('parkingSummaryDetails');
             
-            // Backend should now return properly formatted datetime strings
             const parkingTime = data.parking_timestamp || 'N/A';
             const leavingTime = data.leaving_timestamp || 'N/A';
             
@@ -838,7 +825,6 @@
                 </div>
             `;
 
-            // Calculate bill
             const baseAmount = parseFloat(data.cost);
             const taxRate = 0.18;
             const taxAmount = baseAmount * taxRate;
@@ -860,7 +846,6 @@
                 </div>
             `;
 
-            // Setup payment option highlight
             document.querySelectorAll('.payment-option').forEach(option => {
                 option.addEventListener('click', function () {
                     this.querySelector('input[type="radio"]').checked = true;
@@ -868,8 +853,6 @@
                     this.classList.add('selected');
                 });
             });
-
-            // Show payment modal
             const modal = new bootstrap.Modal(document.getElementById('paymentSummaryModal'));
             modal.show();
         }

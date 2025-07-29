@@ -4,19 +4,16 @@ from datetime import datetime, timezone
 from sqlalchemy import or_
 import pytz
 
-# Create a Blueprint
+
 
 def get_ist_now():
-    """Get current time in IST timezone"""
     ist = pytz.timezone('Asia/Kolkata')
     return datetime.now(ist)
 
 def utc_to_ist(utc_dt):
-    """Convert UTC datetime to IST"""
     if utc_dt is None:
         return None
     
-    # If datetime is naive (no timezone info), assume it's UTC
     if utc_dt.tzinfo is None:
         utc_dt = utc_dt.replace(tzinfo=timezone.utc)
     
@@ -24,13 +21,10 @@ def utc_to_ist(utc_dt):
     return utc_dt.astimezone(ist)
 
 def format_datetime_ist(dt):
-    """Format datetime in IST for display"""
     if dt is None:
         return None
     
-    # Convert to IST if it's not already
     if dt.tzinfo is None:
-        # Assume UTC if no timezone info
         dt = dt.replace(tzinfo=timezone.utc)
     
     ist = pytz.timezone('Asia/Kolkata')
@@ -40,10 +34,8 @@ def format_datetime_ist(dt):
 
 @app.route("/user/search_parking_lots", methods=['GET'])
 def user_search_parking_lots():
-    """Search for available parking lots based on name, address or pincode"""
     search_term = request.args.get('q', '')
     
-    # Search in multiple fields with partial matching
     parking_lots = ParkingLot.query.filter(
         or_(
             ParkingLot.prime_location_name.ilike(f'%{search_term}%'),
@@ -78,7 +70,6 @@ def user_available_spots():
     if not lot_id:
         return jsonify({'error': 'Lot ID is required'}), 400
 
-    # Get ALL spots, not just available ones
     all_spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
 
     lot = ParkingLot.query.get(lot_id)
@@ -100,7 +91,6 @@ def user_available_spots():
 
 @app.route("/user/book_spot", methods=['POST'])
 def book_parking_spot():
-    """Book a parking spot"""
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
     
@@ -117,7 +107,6 @@ def book_parking_spot():
     if not spot_id:
         return jsonify({'error': 'Spot ID is required'}), 400
     
-    # Check if spot exists and is available
     spot = ParkingSpot.query.get(spot_id)
     if not spot:
         return jsonify({'error': 'Parking spot not found'}), 404
@@ -125,13 +114,11 @@ def book_parking_spot():
     if spot.status != 'A':
         return jsonify({'error': 'Parking spot is already occupied'}), 400
     
-    # Get the parking lot for pricing information
     lot = ParkingLot.query.get(spot.lot_id)
     if not lot:
         return jsonify({'error': 'Associated parking lot not found'}), 404
     
     try:
-        # Create reservation with current IST time converted to UTC for storage
         current_ist = get_ist_now()
         current_utc = current_ist.astimezone(timezone.utc).replace(tzinfo=None)
         
@@ -142,17 +129,11 @@ def book_parking_spot():
             status='active'
         )
         
-        # Update spot status to occupied
         spot.status = 'O'
         
-        # Add and commit in proper order
         db.session.add(reservation)
-        db.session.flush()  # This ensures the reservation gets an ID
+        db.session.flush()  
         db.session.commit()
-        
-        print(f"DEBUG: Created reservation ID {reservation.id}")
-        print(f"DEBUG: IST time: {current_ist}")
-        print(f"DEBUG: UTC stored: {current_utc}")
         
         return jsonify({
             'message': 'Parking spot booked successfully',
@@ -170,7 +151,6 @@ def book_parking_spot():
 
 @app.route("/user/release_spot", methods=['POST'])
 def release_parking_spot():
-    """Release a parking spot and complete the reservation"""
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
     
@@ -181,7 +161,6 @@ def release_parking_spot():
         return jsonify({'error': 'Reservation ID is required'}), 400
     
     try:
-        # Find the active reservation
         reservation = Reservation.query.filter_by(
             id=reservation_id, 
             user_id=session['user_id'],
@@ -191,42 +170,29 @@ def release_parking_spot():
         if not reservation:
             return jsonify({'error': 'Active reservation not found'}), 404
         
-        # Get the associated spot
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             return jsonify({'error': 'Associated parking spot not found'}), 404
         
-        # Get the parking lot for pricing information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             return jsonify({'error': 'Associated parking lot not found'}), 404
         
-        # Calculate duration and cost
         current_ist = get_ist_now()
         current_utc = current_ist.astimezone(timezone.utc).replace(tzinfo=None)
         
-        # Calculate duration in hours
         parking_start = reservation.parking_timestamp
         duration_seconds = (current_utc - parking_start).total_seconds()
         duration_hours = max(duration_seconds / 3600, 0.1)  # Minimum 0.1 hours (6 minutes)
         parking_cost = duration_hours * float(lot.price_per_hour)
         
-        # Update reservation
         reservation.leaving_timestamp = current_utc
         reservation.parking_cost = round(parking_cost, 2)
         reservation.status = 'completed'
         
-        # Update spot status to available
         spot.status = 'A'
         
-        # Commit changes
         db.session.commit()
-        
-        print(f"DEBUG: Released reservation ID {reservation.id}")
-        print(f"DEBUG: Parking start: {parking_start}")
-        print(f"DEBUG: Leaving time: {current_utc}")
-        print(f"DEBUG: Duration: {duration_hours:.2f} hours")
-        print(f"DEBUG: Cost: ₹{parking_cost:.2f}")
         
         return jsonify({
             'message': 'Parking spot released successfully',
@@ -249,14 +215,12 @@ def release_parking_spot():
 
 @app.route("/user/active_reservation", methods=['GET'])
 def get_active_reservation():
-    """Get active parking reservation for the logged-in user"""
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
     
     user_id = session['user_id']
     
     try:
-        # Find active reservation
         reservation = Reservation.query.filter_by(
             user_id=user_id,
             status='active'
@@ -265,22 +229,18 @@ def get_active_reservation():
         if not reservation:
             return jsonify({'active_reservation': False})
         
-        # Check if parking_timestamp exists
         if not reservation.parking_timestamp:
             print(f"WARNING: Reservation {reservation.id} has no parking_timestamp")
             return jsonify({'error': 'Invalid reservation data'}), 500
         
-        # Get spot information
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             return jsonify({'error': 'Associated parking spot not found'}), 404
         
-        # Get lot information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             return jsonify({'error': 'Associated parking lot not found'}), 404
         
-        # Calculate current duration and cost for display
         current_ist = get_ist_now()
         current_utc = current_ist.astimezone(timezone.utc).replace(tzinfo=None)
         
@@ -310,30 +270,24 @@ def get_active_reservation():
 
 @app.route("/user/parking_history", methods=['GET'])
 def get_parking_history():
-    """Get parking history for the logged-in user"""
     if 'user_id' not in session:
         return jsonify({'error': 'User not logged in'}), 401
     
     user_id = session['user_id']
-    
-    # Optional status filter
     status = request.args.get('status', None)
-    
     query = Reservation.query.filter_by(user_id=user_id)
+
     if status:
         query = query.filter_by(status=status)
     
-    # Order by most recent first
     reservations = query.order_by(Reservation.parking_timestamp.desc()).all()
     
     result = []
     for reservation in reservations:
-        # Get spot information
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             continue
         
-        # Get lot information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             continue
@@ -356,5 +310,3 @@ def get_parking_history():
 @app.route('/payment')
 def payment_page():
     return render_template('payment.html')
-
-# Route for the user dashboard page

@@ -138,14 +138,12 @@
             width: 16px;
         }
 
-        /* Main Container */
         .main-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
         }
 
-        /* Search Section */
         .search-section {
             background: white;
             padding: 1rem;
@@ -182,7 +180,6 @@
             box-shadow: 0 5px 15px rgba(58, 92, 201, 0.4);
         }
 
-        /* Action Buttons */
         .action-buttons {
             background: white;
             padding: 1.5rem 2rem;
@@ -213,7 +210,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* Active Reservation */
         .active-reservation {
             background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
             border: none;
@@ -235,7 +231,6 @@
             font-size: 1.5rem;
         }
 
-        /* Cards */
         .parking-card {
             background: white;
             border-radius: 15px;
@@ -260,7 +255,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Spot Boxes */
         .spot-box {
             width: 45px;
             height: 45px;
@@ -289,7 +283,6 @@
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
 
-        /* History Section */
         .history-section {
             background: white;
             border-radius: 15px;
@@ -353,7 +346,6 @@
             filter: invert(1);
         }
 
-        /* Loading Animation */
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -364,7 +356,7 @@
             animation: spin 1s ease-in-out infinite;
         }
         .main-content-with-reservation {
-            margin-right: 360px; /* Creates space for the fixed reservation card */
+            margin-right: 360px; 
         }
 
         @keyframes spin {
@@ -372,11 +364,10 @@
         }
         @media (max-width: 1200px) {
             .main-content-with-reservation {
-                margin-right: 0; /* Remove margin on smaller screens */
+                margin-right: 0;
             }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .header-content {
                 padding: 0 1rem;
@@ -404,7 +395,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="header-content">
             <a href="{{ url_for('home') }}" class="logo-link">
@@ -419,7 +409,6 @@
                 <button class="profile-btn" onclick="toggleProfileDropdown()">
                     <i class="fas fa-user-circle"></i>
                     Profile
-                    <!-- <i class="fas fa-chevron-down ms-2"></i> -->
                 </button>
                 <div class="dropdown-menu" id="profileDropdown">
                     <div class="user-profile d-flex align-items-center gap-3 mb-3 p-3 bg-white rounded shadow-sm">
@@ -442,7 +431,6 @@
     </header>
 
     <div class="main-container">
-        <!-- Search Section -->
         <div class="search-section">
             <h4 class="mb-3"><i class="fas fa-search me-2"></i>Find Parking</h4>
             <div class="row">
@@ -588,7 +576,6 @@
         </div>
     </div>
     
-    <!-- Bootstrap & JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let selectedLotId = null;
@@ -596,14 +583,15 @@
         let activeReservationId = null;
         let historyVisible = false;
 
-        // Check for active reservation on page load
         document.addEventListener('DOMContentLoaded', function() {
             checkActiveReservation();
         });
+
         function toggleProfileDropdown() {
             const dropdown = document.getElementById('profileDropdown');
             dropdown.classList.toggle('show');
         }
+
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('profileDropdown');
             const profileBtn = document.querySelector('.profile-btn');
@@ -617,35 +605,26 @@
             if (!dateTimeString) return 'N/A';
             
             try {
-                // Handle different input formats
-                let date;
-                
-                // If it's already a formatted string from the backend (IST format)
+                let date;                
                 if (dateTimeString.includes('-') && dateTimeString.includes(':') && !dateTimeString.includes('T')) {
-                    // Format: "2025-07-26 14:30:45" (already in IST from backend)
                     return dateTimeString;
                 }
                 
-                // If it's an ISO string with Z (UTC)
                 if (dateTimeString.endsWith('Z')) {
                     date = new Date(dateTimeString);
                 } 
-                // If it's an ISO string without timezone info
                 else if (dateTimeString.includes('T')) {
                     date = new Date(dateTimeString + 'Z'); // Assume UTC
                 } 
-                // If it's already in a readable format
                 else {
                     return dateTimeString;
                 }
                 
-                // Check if date is valid
                 if (isNaN(date.getTime())) {
                     console.error('Invalid date:', dateTimeString);
                     return 'Invalid date';
                 }
                 
-                // Convert to IST and format
                 return date.toLocaleString('en-IN', {
                     timeZone: 'Asia/Kolkata',
                     year: 'numeric',
@@ -682,11 +661,6 @@
             document.getElementById('parkingHistorySection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Check for active reservation on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            checkActiveReservation();
-        });
-
         function checkActiveReservation() {
             fetch('/user/active_reservation')
                 .then(res => res.json())
@@ -707,7 +681,6 @@
             const section = document.getElementById('activeReservationSection');
             const details = document.getElementById('activeReservationDetails');
             
-            // Backend now returns formatted datetime strings
             const checkInTime = data.parking_timestamp || 'N/A';
             
             details.innerHTML = `
@@ -736,7 +709,6 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.active_reservation) {
-                        // Show error popup if user has active reservation
                         alert('You already have an active reservation. Please release it before booking a new one.');
                         return;
                     }
@@ -873,9 +845,7 @@
                 return res.json();
             })
             .then(data => {
-                // Save data to localStorage
                 localStorage.setItem('releaseData', JSON.stringify(data));
-                // Redirect to payment page
                 window.location.href = '/payment';
             })
             .catch(err => {
@@ -916,7 +886,6 @@
                         const historyItem = document.createElement('div');
                         historyItem.className = 'card mb-2';
                         
-                        // Handle datetime formatting - backend now returns formatted strings
                         const checkInTime = reservation.parking_timestamp || 'N/A';
                         const checkOutTime = reservation.leaving_timestamp || (reservation.status === 'active' ? 'Still active' : 'N/A');
                         const cost = reservation.parking_cost ? 
@@ -1041,13 +1010,11 @@
             })
             .then(res => {
                 if (!res.ok) {
-                    // 🚨 Forcefully trigger catch with error message
                     return res.json().then(err => { throw err; });
                 }
                 return res.json();
             })
             .then(data => {
-                // Show confirmation modal
                 const reservationModal = bootstrap.Modal.getInstance(document.getElementById('reservationModal'));
                 reservationModal.hide();
 
@@ -1064,12 +1031,10 @@
                 searchParkingLots();
             })
             .catch(err => {
-                // 🚨 Show popup alert to user
                 alert(err.error || 'Booking failed. Please release active reservation first.');
             });
         }
 
-            // Initialize Bootstrap tooltips
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
                 new bootstrap.Tooltip(el);
             });

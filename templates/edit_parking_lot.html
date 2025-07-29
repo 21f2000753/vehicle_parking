@@ -369,23 +369,19 @@
         const form = document.getElementById('editForm');
         const updateBtn = form.querySelector('button[type="submit"]');
         
-        // Get lot ID from URL params
         const urlParams = new URLSearchParams(window.location.search);
         const lotId = urlParams.get('id');
         
         if (lotId) {
             try {
-                // Add loading state
                 updateBtn.classList.add('loading');
                 updateBtn.disabled = true;
                 
-                // Fetch the parking lot data
                 const response = await fetch(`/all_parking_lots`);
                 const lots = await response.json();
                 const lot = lots.find(l => l.id == lotId);
                 
                 if (lot) {
-                    // Populate the form with existing data
                     document.getElementById('lot_id').value = lot.id;
                     document.getElementById('name').value = lot.name;
                     document.getElementById('price_per_hour').value = lot.price_per_hour;
@@ -402,7 +398,6 @@
                 console.error("Failed to load parking lot data:", err);
                 showAlert("Error loading parking lot data", "danger");
             } finally {
-                // Remove loading state
                 updateBtn.classList.remove('loading');
                 updateBtn.disabled = false;
             }
@@ -413,13 +408,10 @@
             }, 2000);
         }
 
-        // Add form validation and submission handling
         form.addEventListener('submit', function(e) {
-            // Add visual feedback on submit
             updateBtn.classList.add('loading');
             updateBtn.disabled = true;
             
-            // You can add additional validation here if needed
             const priceInput = document.getElementById('price_per_hour');
             const spotsInput = document.getElementById('maximum_number_of_spots');
             
@@ -442,7 +434,6 @@
     });
 
     function showAlert(message, type) {
-        // Remove existing alerts
         const existingAlerts = document.querySelectorAll('.alert');
         existingAlerts.forEach(alert => alert.remove());
 

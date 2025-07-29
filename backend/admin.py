@@ -90,9 +90,8 @@ def edit_parking_lot():
                     )
                     db.session.add(spot)
                 db.session.commit()
-            # If spot count decreased, handle carefully
+            
             elif new_max_spots < current_spot_count:
-                # Get spots to remove, starting from highest number
                 spots_to_remove = sorted(
                     existing_spots, 
                     key=lambda x: int(x.spot_number), 
@@ -100,15 +99,11 @@ def edit_parking_lot():
                 )[:current_spot_count - new_max_spots]
                 
                 for spot in spots_to_remove:
-                    # Check if spot is not occupied before removing
                     if spot.status != 'O':
-                        # Check for associated reservations
                         has_reservations = Reservation.query.filter_by(spot_id=spot.id).first() is not None
                         if not has_reservations:
                             db.session.delete(spot)
                     else:
-                        # For occupied spots, we could handle differently
-                        # For now, just leave them but maybe mark as unavailable in the future
                         pass
                 
                 db.session.commit()
@@ -117,7 +112,6 @@ def edit_parking_lot():
         else:
             return jsonify({'error': 'Parking lot not found'}), 404
     
-    # If GET request, render the edit form
     return render_template('edit_parking_lot.html')
 
 @app.route('/delete_parking_lot', methods=['GET', 'POST'])
@@ -129,7 +123,6 @@ def delete_parking_lot():
         ).first()
         
         if parking_lot:
-            # Check if any spots in this lot are occupied
             occupied_spots = ParkingSpot.query.filter_by(
                 lot_id=parking_lot.id, 
                 status='O'
@@ -139,19 +132,15 @@ def delete_parking_lot():
                 flash(f'Cannot delete parking lot "{parking_lot.prime_location_name}". {occupied_spots} spots are currently occupied.', 'error')
                 return redirect(url_for('admin_dashboard'))
             
-            # First delete all associated spots (only if all are empty)
             ParkingSpot.query.filter_by(lot_id=parking_lot.id).delete()
             
-            # Then delete the parking lot
             db.session.delete(parking_lot)
-            db.session.commit()
-            
+            db.session.commit()            
             flash(f'Parking lot "{parking_lot.prime_location_name}" has been successfully deleted.', 'success')
             return redirect(url_for("admin_dashboard"))
         else:
             return jsonify({'error': 'Parking lot not found'}), 404
     
-    # If GET request, render the delete confirmation page
     return render_template('delete_parking_lot.html')
 
 @app.route('/create_parking_spot', methods=['GET', 'POST'])
@@ -167,7 +156,6 @@ def create_parking_spot():
         db.session.commit()
         return jsonify({'message': 'Parking spot created successfully'})
     
-    # If GET request, render the registration form
     return render_template('create_parking_spot.html')
 
 @app.route('/edit_parking_spot', methods=['GET', 'POST'])
@@ -185,7 +173,6 @@ def edit_parking_spot():
         else:
             return jsonify({'message': 'Parking spot not found'})
     
-    # If GET request, render the form
     return render_template('edit_parking_spot.html')
 
 @app.route('/users', methods=['GET'])
@@ -207,23 +194,19 @@ def get_users():
 
 @app.route('/active_bookings', methods=['GET'])
 def get_active_bookings():
-    """Get all active reservations/bookings with detailed information"""
-    # Query all active reservations
+
     active_reservations = Reservation.query.filter_by(status='active').all()
     result = []
     
     for reservation in active_reservations:
-        # Get associated spot information
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             continue
-            
-        # Get lot information
+        
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             continue
             
-        # Get user information
         user = User.query.get(reservation.user_id)
         if not user:
             continue
@@ -246,12 +229,10 @@ def get_active_bookings():
 
 @app.route('/all_parking_spots', methods=['GET'])
 def get_all_parking_spots():
-    """Get all parking spots with lot information"""
+
     parking_spots = ParkingSpot.query.all()
     result = []
-    
     for spot in parking_spots:
-        # Get lot information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             continue
@@ -268,17 +249,15 @@ def get_all_parking_spots():
 
 @app.route('/parking_spots', methods=['GET'])
 def get_lot_parking_spots():
-    """Get parking spots for a specific lot"""
+
     lot_id = request.args.get('lot_id')
     if not lot_id:
         return jsonify({'error': 'Lot ID is required'}), 400
-        
-    # Get lot information first
+    
     lot = ParkingLot.query.get(lot_id)
     if not lot:
         return jsonify({'error': 'Parking lot not found'}), 404
-        
-    # Get all spots for this lot
+    
     parking_spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
     result = []
     
@@ -293,16 +272,13 @@ def get_lot_parking_spots():
     
     return jsonify(result)
 
-# Fix for the delete_parking_spot route to handle DELETE requests
 @app.route('/delete_parking_spot', methods=['GET', 'POST', 'DELETE'])
 def delete_parking_spot():
     if request.method in ['POST', 'DELETE']:
-        # For POST, get data from form
         if request.method == 'POST':
             data = request.form
             spot_id = data.get('id')
-        # For DELETE, get data from query parameters
-        else:  # DELETE
+        else:  
             spot_id = request.args.get('id')
         
         if not spot_id:
@@ -310,7 +286,6 @@ def delete_parking_spot():
             
         parking_spot = ParkingSpot.query.get(spot_id)
         if parking_spot:
-            # Check if spot is available before deleting
             if parking_spot.status == 'O':
                 return jsonify({'error': 'Cannot delete occupied parking spot'}), 400
                 
@@ -320,18 +295,15 @@ def delete_parking_spot():
         else:
             return jsonify({'error': 'Parking spot not found'}), 404
     
-    # If GET request, render the form
     return render_template('delete_parking_spot.html')
 
 
 @app.route('/search_parking_lots', methods=['GET'])
 def search_parking_lots():
-    """Search parking lots by name, address or pincode"""
     search_term = request.args.get('q', '')
     if not search_term:
         return jsonify([])
     
-    # Search in multiple fields with partial matching
     parking_lots = ParkingLot.query.filter(
         or_(
             ParkingLot.prime_location_name.ilike(f'%{search_term}%'),
@@ -360,12 +332,10 @@ def search_parking_lots():
 
 @app.route('/search_users', methods=['GET'])
 def search_users():
-    """Search users by username, email, or address"""
     search_term = request.args.get('q', '')
     if not search_term:
         return jsonify([])
     
-    # Search in multiple fields with partial matching
     users = User.query.filter(
         or_(
             User.username.ilike(f'%{search_term}%'),
@@ -390,44 +360,34 @@ def search_users():
 
 @app.route('/search_reservations', methods=['GET'])
 def search_reservations():
-    """Search reservations by user, date, or status"""
     search_term = request.args.get('q', '')
     status_filter = request.args.get('status', '')  # active, completed, cancelled
     
-    # Start with a base query
     query = Reservation.query
     
-    # Add status filter if provided
     if status_filter:
         query = query.filter(Reservation.status == status_filter)
     
-    # Add search term if provided
     if search_term:
-        # We need to join with User to search by username
         reservations = query.join(User).filter(
             or_(
                 User.username.ilike(f'%{search_term}%'),
                 User.email.ilike(f'%{search_term}%')
-                # Add other fields to search on as needed
             )
         ).all()
     else:
-        # If no search term, return all reservations with the status filter
         reservations = query.all()
     
     result = []
     for reservation in reservations:
-        # Get user information
         user = User.query.get(reservation.user_id)
         if not user:
             continue
             
-        # Get spot information
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             continue
             
-        # Get lot information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             continue
@@ -451,7 +411,6 @@ def search_reservations():
 
 @app.route('/reservations', methods=['GET'])
 def get_all_reservations():
-    """Get all reservations with optional status filter"""
     status_filter = request.args.get('status', '')
     
     query = Reservation.query
@@ -462,17 +421,14 @@ def get_all_reservations():
     result = []
     
     for reservation in reservations:
-        # Get user information
         user = User.query.get(reservation.user_id)
         if not user:
             continue
             
-        # Get spot information
         spot = ParkingSpot.query.get(reservation.spot_id)
         if not spot:
             continue
             
-        # Get lot information
         lot = ParkingLot.query.get(spot.lot_id)
         if not lot:
             continue

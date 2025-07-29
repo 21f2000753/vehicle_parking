@@ -483,7 +483,6 @@
             border-top-right-radius: 12px;
             border-right: none;
         }
-        /* Parking Spots Row Styling with User Table */
         #spots-table-body td {
             padding: 12px 16px;
             font-size: 14px;
@@ -502,7 +501,6 @@
         #spots-table-body tr:hover {
             background-color: #eef1f9 !important;
         }
-        /* Admin Header Controls */
         .admin-controls {
             display: flex;
             align-items: center;
@@ -559,7 +557,6 @@
             transform: translateY(0);
         }
 
-        /* Logout Modal Styles */
         .logout-modal .modal-content {
             border-radius: 20px;
             border: none;
@@ -588,7 +585,6 @@
             border-top: none;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -697,7 +693,6 @@
         .lot-card:nth-child(2) { animation-delay: 0.1s; }
         .lot-card:nth-child(3) { animation-delay: 0.2s; }
         .lot-card:nth-child(4) { animation-delay: 0.3s; }
-        /* Custom Tooltip Styles */
         .tooltip {
             font-size: 13px;
         }
@@ -730,7 +725,6 @@
             font-style: italic;
         }
 
-        /* Enhanced disabled button styling */
         .btn-custom.btn-secondary.disabled-delete-btn {
             background: linear-gradient(135deg, #6c757d, #5a6268);
             color: white;
@@ -748,15 +742,13 @@
         }
 
         .btn-custom.btn-secondary.disabled-delete-btn::before {
-            display: none; /* Remove shine effect on disabled buttons */
+            display: none;
         }
 
-        /* Add a subtle warning animation on hover */
         .disabled-delete-btn:hover {
             animation: subtle-shake 0.5s ease-in-out;
         }
 
-        /* Enhanced tooltip z-index and pointer events */
         .tooltip {
             font-size: 13px;
             z-index: 9999 !important;
@@ -772,7 +764,7 @@
         }
 
         .disabled-delete-btn {
-            pointer-events: auto !important; /* Ensure disabled buttons can still show tooltips */
+            pointer-events: auto !important; 
         }
 
         @keyframes subtle-shake {
@@ -853,23 +845,11 @@
                             </tr>
                         </thead>
                         <tbody id="users-table-body" class="bg-light">
-                            <!-- User data will be loaded here -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <script>
-        document.getElementById('userSearch').addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('#users-table-body tr').forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-        </script>
-
 
         
         <!-- Parking Spots Management Tab -->
@@ -879,7 +859,6 @@
                     <div>
                         <select id="lotFilterDropdown" class="form-select form-select-sm d-inline-block" style="width: auto;">
                             <option value="all">All Lots</option>
-                            <!-- Lot options will be loaded here -->
                         </select>
                     </div>
                     <div>
@@ -901,7 +880,6 @@
                             </tr>
                         </thead>
                         <tbody id="spots-table-body" class="bg-light">
-                            <!-- Spots data will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -984,11 +962,17 @@
     </div>
 </div>
 
-<!-- Bootstrap + JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Parking Lots Loader Script (Same Logic, Enhanced UI) -->
 <script>
+
+    document.getElementById('userSearch').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('#users-table-body tr').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
     async function loadLots() {
         try {
             const res = await fetch('/all_parking_lots');
@@ -1018,7 +1002,6 @@
                 lotBox.className = 'lot-card';
                 lotBox.style.animationDelay = `${index * 0.1}s`;
 
-                // Calculate occupancy percentage
                 const occupancyPercentage = (lot.occupied / lot.max_spots) * 100;
                 let occupancyClass = '';
                 if (occupancyPercentage >= 90) occupancyClass = 'full';
@@ -1037,7 +1020,6 @@
                     </div>
                     <div class="spot-container d-flex flex-wrap justify-content-center">`;
 
-                // Create spot matrix - ensure we show the correct number of spots
                 for (let i = 0; i < lot.max_spots; i++) {
                     const spotData = lot.spots[i] || { spot_number: i+1, status: 'A' };
                     const statusClass = spotData.status === 'O' ? 'occupied' : 'available';
@@ -1098,7 +1080,6 @@
         }
     }
 
-// Add this function to handle delete confirmation
     function confirmDelete(lotName, occupiedCount) {
         if (occupiedCount > 0) {
             alert(`Cannot delete "${lotName}". ${occupiedCount} spots are currently occupied. Please wait for all users to vacate their spots before deleting this parking lot.`);
@@ -1107,10 +1088,7 @@
         return confirm(`⚠️ Are you sure you want to delete "${lotName}"?\n\nThis action will:\n• Permanently remove the parking lot\n• Delete all associated parking spots\n• Cannot be undone\n\nClick OK to confirm deletion.`);
     }
 
-    // Add this function to initialize tooltips
-    // Enhanced tooltip initialization function
     function initializeTooltips() {
-        // Dispose of ALL existing tooltips first
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
             const existingTooltip = bootstrap.Tooltip.getInstance(el);
             if (existingTooltip) {
@@ -1118,7 +1096,6 @@
             }
         });
         
-        // Initialize new tooltips with enhanced options
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         tooltipTriggerList.forEach(function (tooltipTriggerEl) {
             new bootstrap.Tooltip(tooltipTriggerEl, {
@@ -1131,29 +1108,23 @@
         });
     }
 
-    // Also add this at the end of your loadLots() function, replace the existing setTimeout:
     setTimeout(() => {
         initializeTooltips();
-        // Force re-initialization after DOM is fully updated
         requestAnimationFrame(() => {
             initializeTooltips();
         });
     }, 200);
-        // Function to redirect to the spots tab with the selected lot
+
     function manageSpots(lotId) {
-        // Select the spots tab
         document.getElementById('spots-tab').click();
         
-        // Set the dropdown to the selected lot
         setTimeout(() => {
             const lotDropdown = document.getElementById('lotFilterDropdown');
             lotDropdown.value = lotId;
-            // Trigger change event to load spots for this lot
             lotDropdown.dispatchEvent(new Event('change'));
         }, 100);
     }
 
-    // Function to load users with their spot usage info
     async function loadUsers() {
         try {
             const res = await fetch('/users');
@@ -1199,7 +1170,6 @@
         }
     }
 
-    // Function to load parking spots
     async function loadParkingSpots(lotId = 'all') {
         try {
             const endpoint = lotId === 'all' ? '/all_parking_spots' : `/parking_spots?lot_id=${lotId}`;
@@ -1270,14 +1240,12 @@
 
 
     
-    // Function to populate lot filter dropdown
     async function populateLotDropdown() {
         try {
             const res = await fetch('/all_parking_lots');
             const lots = await res.json();
             const dropdown = document.getElementById('lotFilterDropdown');
             
-            // Keep the "All Lots" option and add lots from the response
             const allOption = dropdown.querySelector('option[value="all"]');
             dropdown.innerHTML = '';
             dropdown.appendChild(allOption);
@@ -1293,15 +1261,12 @@
         }
     }
     
-    // Logout Confirmation Modal
     function confirmLogout() {
-        // Remove any existing logout modal
         const existingModal = document.querySelector('.logout-modal');
         if (existingModal) {
             existingModal.remove();
         }
         
-        // Create custom confirmation modal
         const modal = document.createElement('div');
         modal.className = 'modal fade logout-modal';
         modal.innerHTML = `
@@ -1341,36 +1306,29 @@
         });
     }
 
-    // Perform Logout Function
     async function performLogout() {
         try {
-            // Get logout button and show loading state
             const logoutBtn = document.querySelector('.logout-modal .btn-danger-custom');
             const originalText = logoutBtn.innerHTML;
             logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Logging out...';
             logoutBtn.disabled = true;
             
-            // Disable cancel button
             const cancelBtn = document.querySelector('.logout-modal .btn-secondary-custom');
             cancelBtn.disabled = true;
             
-            // Make logout request to your existing endpoint
             const response = await fetch('/logout', {
                 method: 'GET',
                 credentials: 'include'
             });
             
             if (response.ok) {
-                // Show success state
                 logoutBtn.innerHTML = '<i class="fas fa-check me-1"></i>Logged out!';
                 logoutBtn.className = 'btn btn-custom btn-success-custom';
                 
-                // Close modal after short delay
                 setTimeout(() => {
                     const modal = bootstrap.Modal.getInstance(document.querySelector('.logout-modal'));
                     if (modal) modal.hide();
                     
-                    // Redirect to login page
                     window.location.href = '/login';
                 }, 1500);
             } else {
@@ -1380,21 +1338,17 @@
         } catch (error) {
             console.error('Logout error:', error);
             
-            // Show error state
             const logoutBtn = document.querySelector('.logout-modal .btn-danger-custom');
             const cancelBtn = document.querySelector('.logout-modal .btn-secondary-custom');
             
             logoutBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Error';
             logoutBtn.className = 'btn btn-custom btn-warning-custom';
             
-            // Re-enable buttons
             logoutBtn.disabled = false;
             cancelBtn.disabled = false;
             
-            // Show error message
             alert('Logout failed. Please try again.');
             
-            // Reset button after 2 seconds
             setTimeout(() => {
                 logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt me-1"></i>Yes, Logout';
                 logoutBtn.className = 'btn btn-custom btn-danger-custom';
@@ -1402,30 +1356,23 @@
         }
 }
 
-// Alternative: Simple Direct Logout (without confirmation modal)
     function directLogout() {
-        // Show loading in header button
         const headerLogoutBtn = document.querySelector('.btn-logout');
         const originalText = headerLogoutBtn.innerHTML;
         headerLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
-        headerLogoutBtn.disabled = true;
-        
-        // Direct redirect to logout
+        headerLogoutBtn.disabled = true;        
         window.location.href = '/logout';
     }
     
     document.addEventListener("DOMContentLoaded", () => {
-        // Load parking lots data
         loadLots();
         
-        // Load data when tabs are clicked
         document.getElementById('users-tab').addEventListener('click', loadUsers);
         document.getElementById('spots-tab').addEventListener('click', () => {
             populateLotDropdown();
             loadParkingSpots();
         });
         
-        // Add lot filter dropdown functionality
         document.getElementById('lotFilterDropdown').addEventListener('change', (e) => {
             loadParkingSpots(e.target.value);
         });

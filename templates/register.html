@@ -251,10 +251,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message === "User registered successfully") {
-                    alert(data.message);  // Show success popup
-                    window.location.href = "{{ url_for('login') }}";  // Redirect to login page
+                    alert(data.message);
+                    window.location.href = "{{ url_for('login') }}";
                 } else {
-                    alert(data.message);  // Show error popup (e.g., user already exists)
+                    alert(data.message);
                 }
             })
             .catch(error => {
