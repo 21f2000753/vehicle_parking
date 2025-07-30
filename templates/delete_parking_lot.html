@@ -56,7 +56,10 @@
             <form id="deleteForm" method="POST" action="/delete_parking_lot">
                 <input type="hidden" id="name" name="name">
                 <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                <a href="/admin_dashboard" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-custom btn-secondary-custom">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
             </form>
         </div>
     </div>

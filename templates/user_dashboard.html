@@ -585,7 +585,43 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             checkActiveReservation();
+            loadAllParkingLots();
         });
+
+        function loadAllParkingLots() {
+            const parkingLotsContainer = document.getElementById('parkingLotsList');
+            parkingLotsContainer.innerHTML = '<p>Loading available parking lots...</p>';
+
+            fetch('/user/search_parking_lots?q=') // Empty query to get all lots
+                .then(res => res.json())
+                .then(data => {
+                    parkingLotsContainer.innerHTML = '';
+                    if (!data.length) {
+                        parkingLotsContainer.innerHTML = '<p>No parking lots available at the moment.</p>';
+                        return;
+                    }
+
+                    data.forEach(lot => {
+                        const lotCard = document.createElement('div');
+                        lotCard.className = 'col-md-4';
+                        lotCard.innerHTML = `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5>${lot.name}</h5>
+                                    <p>${lot.address}</p>
+                                    <p><strong>${lot.available}</strong> Available / <strong>${lot.occupied}</strong> Occupied</p>
+                                    <p>₹ ${lot.price_per_hour.toFixed(2)} per hour</p>
+                                    <button class="btn btn-primary" onclick="selectLot(${lot.id}, '${lot.name}', ${lot.price_per_hour})">Book Spot</button>
+                                </div>
+                            </div>
+                        `;
+                        parkingLotsContainer.appendChild(lotCard);
+                    });
+                })
+                .catch(err => {
+                    parkingLotsContainer.innerHTML = `<div class="alert alert-danger">Error loading parking lots: ${err}</div>`;
+                });
+        }
 
         function toggleProfileDropdown() {
             const dropdown = document.getElementById('profileDropdown');
@@ -911,6 +947,10 @@
 
         function searchParkingLots() {
             const searchTerm = document.getElementById('searchInput').value;
+            if (!searchTerm.trim()) {
+                loadAllParkingLots();
+                return;
+            }
             const parkingLotsContainer = document.getElementById('parkingLotsList');
             parkingLotsContainer.innerHTML = '<p>Loading...</p>';
 
